@@ -14,6 +14,15 @@ run:
 	@go run cmd/api/main.go &
 	@npm install --prefer-offline --no-fund --prefix ./frontend
 	@npm run dev --prefix ./frontend
+
+# Run backend only
+run-backend:
+	@go run cmd/api/main.go
+
+# Stop backend only
+stop-backend:
+	lsof -ti :8080 | xargs kill -9
+
 # Create DB container
 docker-run:
 	@if docker compose up --build 2>/dev/null; then \
@@ -63,4 +72,4 @@ watch:
             fi; \
         fi
 
-.PHONY: all build run test clean watch docker-run docker-down itest
+.PHONY: all build run run-backend test clean watch docker-run docker-down itest

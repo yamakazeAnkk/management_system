@@ -32,14 +32,27 @@ coverage.xml
 .vscode/
 .idea/
 
-# Node/Vite
-node_modules/
+# Frontend (ignore node_modules, dist, lockfiles)
 frontend/node_modules/
 frontend/dist/
 frontend/.vite/
+frontend/.turbo/
+frontend/.next/
+frontend/.cache/
+frontend/package-lock.json
+frontend/pnpm-lock.yaml
+frontend/yarn.lock
+
+# Root-level node_modules if any
+node_modules/
+
+# web alt app
 web/node_modules/
 web/dist/
 web/.vite/
+web/package-lock.json
+web/pnpm-lock.yaml
+web/yarn.lock
 
 # Docker
 docker-data/

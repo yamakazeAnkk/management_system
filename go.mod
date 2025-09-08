@@ -1,4 +1,4 @@
-module my_management
+module management_system
 
 go 1.25.0
 
