@@ -18,14 +18,23 @@
 Dự án cung cấp API backend bằng Go (Gin), kết nối MongoDB, kèm frontend React (Vite). Cấu trúc code được tách lớp rõ ràng: handler/middleware, service, repository, model.
 
 ## Kiến trúc nhanh
-```mermaid
-flowchart LR
-  Client[Web Client (React/Vite)] -->|HTTP| API[API (Gin Router)]
-  API --> MW[Middleware]
-  API --> Handler[Handler / Controller]
-  Handler --> Service[Service Layer]
-  Service --> Repo[Repository]
-  Repo --> DB[(MongoDB)]
+```text
+[Web Client (React/Vite)] --HTTP--> [API (Gin Router)]
+                                     |
+                                     v
+                               [Middleware]
+                                     |
+                                     v
+                           [Handler / Controller]
+                                     |
+                                     v
+                              [Service Layer]
+                                     |
+                                     v
+                                 [Repository]
+                                     |
+                                     v
+                                   (MongoDB)
 ```
 
 ## Cấu trúc thư mục chính
