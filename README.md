@@ -1,54 +1,138 @@
-# Project my_management
+<div align="center">
 
-One Paragraph of project description goes here
+# Management System
 
-## Getting Started
+[![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go)](https://go.dev/)
+[![Node](https://img.shields.io/badge/Node-20+-339933?logo=node.js)](https://nodejs.org/)
+[![Vite](https://img.shields.io/badge/Vite-7.x-646CFF?logo=vite)](https://vitejs.dev/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+<i>Hệ thống quản lý fullstack: Go (Gin) + MongoDB + React/Vite</i>
 
-## MakeFile
+</div>
 
-Run build make command with tests
-```bash
-make all
+---
+
+## Tổng quan
+Dự án cung cấp API backend bằng Go (Gin), kết nối MongoDB, kèm frontend React (Vite). Cấu trúc code được tách lớp rõ ràng: handler/middleware, service, repository, model.
+
+## Kiến trúc nhanh
+```mermaid
+flowchart LR
+  Client[Web Client (React/Vite)] -->|HTTP| API[API (Gin Router)]
+  API --> MW[Middleware]
+  API --> Handler[Handler / Controller]
+  Handler --> Service[Service Layer]
+  Service --> Repo[Repository]
+  Repo --> DB[(MongoDB)]
 ```
 
-Build the application
-```bash
-make build
+## Cấu trúc thư mục chính
+```text
+project/
+├── api/
+│   ├── handler/
+│   ├── middleware/
+│   └── router.go
+├── cmd/
+│   ├── api/ (entry backend)
+│   └── app/ (entry demo)
+├── config/
+├── internal/
+│   ├── model/
+│   ├── repository/
+│   ├── service/
+│   └── util/
+├── frontend/ (React + Vite)
+├── migrations/
+├── scripts/
+├── test/
+├── web/ (tùy chọn)
+├── Makefile
+├── docker-compose.yml
+├── go.mod / go.sum
+└── README.md
 ```
 
-Run the application
+## Yêu cầu hệ thống
+- Go 1.22+
+- Node 20+ (khuyến nghị 20 LTS)
+- MongoDB (Docker hoặc cài local)
+
+## Cài đặt nhanh
+```bash
+git clone https://github.com/yamakazeAnkk/management_system.git
+cd management_system
+
+# Cài Node 20 (macOS Homebrew ví dụ)
+brew install node@20
+echo 'export PATH="/opt/homebrew/opt/node@20/bin:$PATH"' >> ~/.zshrc && exec zsh
+
+# Cài Go module
+go mod tidy
+
+# Cài frontend deps
+cd frontend && npm install && cd ..
+```
+
+## Chạy Backend (chỉ backend)
+```bash
+# Foreground
+make run-backend
+# hoặc
+go run cmd/api/main.go
+
+# Dừng (nếu chiếm cổng 8080)
+lsof -ti :8080 | xargs kill -9
+```
+
+## Chạy toàn bộ (backend + frontend)
 ```bash
 make run
-```
-Create DB container
-```bash
-make docker-run
+# Backend chạy nền, frontend Vite tại http://localhost:5173
 ```
 
-Shutdown DB Container
+## Dịch vụ MongoDB
+- Dùng Docker Compose:
 ```bash
-make docker-down
+make docker-run    # bật
+make docker-down   # tắt
+```
+- Hoặc cài local (Homebrew):
+```bash
+brew tap mongodb/brew
+brew install mongodb-community@7.0
+brew services start mongodb-community@7.0
 ```
 
-DB Integrations Test:
-```bash
-make itest
+## Endpoints cơ bản
+```http
+GET /health  -> 200 {"message": "It's healthy"}
 ```
 
-Live reload the application:
+## Lệnh Make hữu ích
 ```bash
-make watch
-```
-
-Run the test suite:
-```bash
+make all        # build + test
+make build      # build backend
+make run        # backend + frontend
+make run-backend
 make test
-```
-
-Clean up binary from the last build:
-```bash
+make itest
+make watch      # live reload (yêu cầu air)
 make clean
 ```
-# management_system
+
+## Ảnh minh họa
+> Thêm ảnh vào `docs/images/` rồi tham chiếu tại đây
+
+![Kiến trúc tổng quan](docs/images/architecture.png)
+![Màn hình chính](docs/images/screenshot-home.png)
+
+## Quy ước phát triển
+- Nhánh: `feature/...`, `fix/...`, `chore/...`
+- Commit: Conventional Commits (ví dụ: `feat: add user service`)
+- PR nhỏ, rõ ràng, kèm mô tả và checklist
+
+## Giấy phép
+Phát hành dưới giấy phép MIT – xem tệp [LICENSE](./LICENSE).
