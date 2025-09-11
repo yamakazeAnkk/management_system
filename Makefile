@@ -16,7 +16,7 @@ run:
 	@npm run dev --prefix ./frontend
 
 # Run backend only
-run-backend:
+run-backend:		
 	@go run cmd/api/main.go
 
 # Stop backend only

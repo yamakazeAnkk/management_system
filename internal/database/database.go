@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 type Service interface {
@@ -21,33 +23,86 @@ type service struct {
 }
 
 var (
-	host = os.Getenv("BLUEPRINT_DB_HOST")
-	port = os.Getenv("BLUEPRINT_DB_PORT")
-	//database = os.Getenv("BLUEPRINT_DB_DATABASE")
+	mongoURI = os.Getenv("MONGO_URI")
 )
 
+// sanitizeMongoURI removes options that are incompatible with SRV/multi-host URIs.
+// In particular, MongoDB Atlas SRV must not use directConnection=true.
+func sanitizeMongoURI(uri string) string {
+	if uri == "" {
+		return uri
+	}
+	lower := strings.ToLower(uri)
+	if !strings.Contains(lower, "directconnection=") && !strings.Contains(lower, "connect=direct") {
+		return uri
+	}
+
+	cleanup := func(s string, key string) string {
+		for _, val := range []string{"true", "false", "direct"} {
+			for _, sep := range []string{"?", "&"} {
+				needle := fmt.Sprintf("%s%s=%s", sep, key, val)
+				s = strings.ReplaceAll(s, needle, "")
+			}
+		}
+		return s
+	}
+
+	clean := uri
+	clean = cleanup(clean, "directConnection")
+	clean = cleanup(clean, "connect")
+
+	// Remove any accidental "?&" or "&&" in the query string
+	clean = strings.ReplaceAll(clean, "?&", "?")
+	clean = strings.ReplaceAll(clean, "&&", "&")
+	// Remove trailing "?" or "&" if present
+	if strings.HasSuffix(clean, "&") || strings.HasSuffix(clean, "?") {
+		clean = strings.TrimRight(clean, "&?")
+	}
+	return clean
+}
+
 func New() Service {
-	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%s", host, port)))
+	uri := mongoURI
+	if uri == "" {
+		uri = "mongodb://localhost:27017"
+	}
 
+	uri = sanitizeMongoURI(uri)
+
+	// Reduce startup blocking: small timeouts
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	clientOpts := options.Client().ApplyURI(uri)
+	clientOpts.SetServerSelectionTimeout(2 * time.Second)
+	// Atlas recommends Server API v1
+	clientOpts.SetServerAPIOptions(options.ServerAPI(options.ServerAPIVersion1))
+
+	client, err := mongo.Connect(ctx, clientOpts)
 	if err != nil {
-		log.Fatal(err)
-
+		log.Printf("mongodb connect error: %v", err)
+		return &service{db: nil}
 	}
-	return &service{
-		db: client,
-	}
+	// Do not ping at startup to avoid blocking the server
+	return &service{db: client}
 }
 
 func (s *service) Health() map[string]string {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	err := s.db.Ping(ctx, nil)
-	if err != nil {
-		log.Fatalf("db down: %v", err)
+	status := map[string]string{"message": "It's healthy"}
+	if s.db == nil {
+		status["db"] = "disconnected"
+		status["message"] = "Degraded: DB disconnected"
+		return status
 	}
-
-	return map[string]string{
-		"message": "It's healthy",
+	if err := s.db.Ping(ctx, readpref.Primary()); err != nil {
+		status["db"] = "unreachable"
+		status["error"] = err.Error()
+		status["message"] = "Degraded: DB unreachable"
+		return status
 	}
+	status["db"] = "ok"
+	return status
 }

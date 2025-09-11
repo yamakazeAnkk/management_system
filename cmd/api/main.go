@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"management_system/api/server"
+	_ "management_system/docs"
 )
 
 func gracefulShutdown(apiServer *http.Server, done chan bool) {

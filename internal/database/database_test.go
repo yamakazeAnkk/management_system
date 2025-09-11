@@ -2,7 +2,9 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"os"
 	"testing"
 
 	"github.com/testcontainers/testcontainers-go"
@@ -25,23 +27,30 @@ func mustStartMongoContainer() (func(context.Context, ...testcontainers.Terminat
 		return dbContainer.Terminate, err
 	}
 
-	host = dbHost
-	port = dbPort.Port()
+	mongoURI = fmt.Sprintf("mongodb://%s:%s", dbHost, dbPort.Port())
 
 	return dbContainer.Terminate, err
 }
 
 func TestMain(m *testing.M) {
+	// If MONGO_URI is set, use it and do not start Docker
+	if uri := os.Getenv("MONGO_URI"); uri != "" {
+		code := m.Run()
+		os.Exit(code)
+	}
+
 	teardown, err := mustStartMongoContainer()
 	if err != nil {
-		log.Fatalf("could not start mongodb container: %v", err)
+		log.Printf("could not start mongodb container, skipping tests: %v", err)
+		os.Exit(0)
 	}
 
-	m.Run()
+	code := m.Run()
 
 	if teardown != nil && teardown(context.Background()) != nil {
-		log.Fatalf("could not teardown mongodb container: %v", err)
+		log.Printf("could not teardown mongodb container: %v", err)
 	}
+	os.Exit(code)
 }
 
 func TestNew(t *testing.T) {
