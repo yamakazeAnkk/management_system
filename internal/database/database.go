@@ -16,10 +16,13 @@ import (
 
 type Service interface {
 	Health() map[string]string
+	GetDatabase() *mongo.Database
+	GetClient() *mongo.Client
 }
 
 type service struct {
-	db *mongo.Client
+	db       *mongo.Client
+	database *mongo.Database
 }
 
 var (
@@ -81,10 +84,24 @@ func New() Service {
 	client, err := mongo.Connect(ctx, clientOpts)
 	if err != nil {
 		log.Printf("mongodb connect error: %v", err)
-		return &service{db: nil}
+		return &service{db: nil, database: nil}
 	}
 	// Do not ping at startup to avoid blocking the server
-	return &service{db: client}
+
+	// Get database name from URI or use default
+	dbName := "management_system" // Default database name
+	if uri != "" && strings.Contains(uri, "/") {
+		parts := strings.Split(uri, "/")
+		if len(parts) > 3 && strings.Contains(parts[3], "?") {
+			dbName = strings.Split(parts[3], "?")[0]
+		} else if len(parts) > 3 {
+			dbName = parts[3]
+		}
+	}
+
+	database := client.Database(dbName)
+
+	return &service{db: client, database: database}
 }
 
 func (s *service) Health() map[string]string {
@@ -105,4 +122,14 @@ func (s *service) Health() map[string]string {
 	}
 	status["db"] = "ok"
 	return status
+}
+
+// GetDatabase returns the database instance
+func (s *service) GetDatabase() *mongo.Database {
+	return s.database
+}
+
+// GetClient returns the MongoDB client
+func (s *service) GetClient() *mongo.Client {
+	return s.db
 }
