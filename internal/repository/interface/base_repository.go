@@ -1,8 +1,10 @@
-package repository
+package interfaces
 
-import "context"
+import (
+	"context"
+)
 
-type BaseRepository[T any ] interface {
+type BaseRepository[T any] interface {
 	Create(ctx context.Context, data T) error
 	GetByID(ctx context.Context, id string) (T, error)
 	Update(ctx context.Context, id string, data T) error

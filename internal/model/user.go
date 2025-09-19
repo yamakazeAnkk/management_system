@@ -12,7 +12,7 @@ type User struct {
 	FullName      string     `bson:"fullName"`
 	Email         *string    `bson:"email,omitempty"`
 	Phone         *string    `bson:"phone,omitempty"`
-	DepartmentID  *UUID     `bson:"departmentId,omitempty"`
+	DepartmentID  *UUID      `bson:"departmentId,omitempty"`
 	PositionLevel *int32     `bson:"positionLevel,omitempty"` // 1=Staff,2=Lead,3=Manager
 	LocationCode  *string    `bson:"locationCode,omitempty"`  // HCM/HN...
 	IsActive      bool       `bson:"isActive"`

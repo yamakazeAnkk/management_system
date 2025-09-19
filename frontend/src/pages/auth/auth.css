@@ -1,0 +1,129 @@
+/* Auth Pages Styles */
+.auth-container {
+  min-height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  min-width: 320px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+}
+
+.auth-card.register {
+  max-width: 500px;
+}
+
+.auth-title {
+  margin: 0 !important;
+  color: #1890ff !important;
+  font-size: 24px !important;
+}
+
+.auth-subtitle {
+  color: #666 !important;
+  font-size: 14px !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .auth-container {
+    padding: 10px;
+  }
+  
+  .auth-card {
+    max-width: calc(100vw - 20px);
+    min-width: 280px;
+  }
+  
+  .auth-card.register {
+    max-width: calc(100vw - 20px);
+  }
+  
+  .auth-title {
+    font-size: 20px !important;
+  }
+  
+  .auth-subtitle {
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 5px;
+  }
+  
+  .auth-card {
+    max-width: calc(100vw - 10px);
+    min-width: 260px;
+  }
+  
+  .auth-card.register {
+    max-width: calc(100vw - 10px);
+  }
+  
+  .auth-title {
+    font-size: 18px !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .auth-card {
+    max-width: 450px;
+  }
+  
+  .auth-title {
+    font-size: 28px !important;
+  }
+  
+  .auth-subtitle {
+    font-size: 16px !important;
+  }
+}
+
+/* Form responsive */
+@media (max-width: 480px) {
+  .ant-form-item-label {
+    padding-bottom: 4px !important;
+  }
+  
+  .ant-form-item {
+    margin-bottom: 16px !important;
+  }
+  
+  .ant-input,
+  .ant-input-password {
+    font-size: 14px !important;
+  }
+  
+  .ant-btn {
+    font-size: 14px !important;
+    height: 40px !important;
+  }
+}
+
+/* Card responsive */
+@media (max-width: 768px) {
+  .ant-card-body {
+    padding: 20px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .ant-card-body {
+    padding: 16px !important;
+  }
+}

@@ -1,0 +1,36 @@
+export const apiConfig = {
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
+  timeout: 10000,
+  endpoints: {
+    auth: {
+      login: '/auth/login',
+      register: '/auth/register',
+      refresh: '/auth/refresh',
+      logout: '/auth/logout',
+      forgotPassword: '/auth/forgot-password',
+      resetPassword: '/auth/reset-password',
+    },
+    users: {
+      list: '/users',
+      create: '/users',
+      get: (id: string) => `/users/${id}`,
+      update: (id: string) => `/users/${id}`,
+      delete: (id: string) => `/users/${id}`,
+      changePassword: (id: string) => `/users/${id}/change-password`,
+    },
+    roles: {
+      list: '/roles',
+      create: '/roles',
+      get: (id: string) => `/roles/${id}`,
+      update: (id: string) => `/roles/${id}`,
+      delete: (id: string) => `/roles/${id}`,
+    },
+    departments: {
+      list: '/departments',
+      create: '/departments',
+      get: (id: string) => `/departments/${id}`,
+      update: (id: string) => `/departments/${id}`,
+      delete: (id: string) => `/departments/${id}`,
+    },
+  },
+};

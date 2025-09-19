@@ -19,9 +19,19 @@ run:
 run-backend:		
 	@go run cmd/api/main.go
 
+# Run frontend only
+run-frontend:
+	@echo "Starting frontend development server..."
+	@cd frontend && npm install --prefer-offline --no-fund
+	@cd frontend && npm run dev
+
 # Stop backend only
 stop-backend:
 	lsof -ti :8080 | xargs kill -9
+
+# Stop frontend only
+stop-frontend:
+	lsof -ti :5173 | xargs kill -9
 
 # Create DB container
 docker-run:
@@ -72,4 +82,4 @@ watch:
             fi; \
         fi
 
-.PHONY: all build run run-backend test clean watch docker-run docker-down itest
+.PHONY: all build run run-backend run-frontend stop-backend stop-frontend test clean watch docker-run docker-down itest

@@ -1,0 +1,29 @@
+export const LIMITS = {
+  // Pagination
+  DEFAULT_PAGE_SIZE: 10,
+  MAX_PAGE_SIZE: 100,
+  PAGE_SIZE_OPTIONS: [10, 20, 50, 100],
+  
+  // File upload
+  MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
+  ALLOWED_FILE_TYPES: ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'],
+  
+  // Form validation
+  MIN_PASSWORD_LENGTH: 6,
+  MAX_PASSWORD_LENGTH: 128,
+  MIN_USERNAME_LENGTH: 3,
+  MAX_USERNAME_LENGTH: 50,
+  MAX_EMAIL_LENGTH: 255,
+  MAX_NAME_LENGTH: 100,
+  MAX_PHONE_LENGTH: 20,
+  MAX_DESCRIPTION_LENGTH: 500,
+  
+  // API
+  REQUEST_TIMEOUT: 30000, // 30 seconds
+  MAX_RETRY_ATTEMPTS: 3,
+  
+  // UI
+  MAX_TABLE_ROWS: 1000,
+  DEBOUNCE_DELAY: 300,
+  ANIMATION_DURATION: 300,
+} as const;
