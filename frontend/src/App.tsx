@@ -1,21 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ConfigProvider, App as AntApp } from 'antd';
 import viVN from 'antd/locale/vi_VN';
-import LoginPage from './pages/auth/LoginPage';
-import DashboardPage from './pages/dashboard/DashboardPage';
+import { AppRouter } from './router';
 import './App.css';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-  };
-
   return (
     <ConfigProvider
       locale={viVN}
@@ -27,11 +16,7 @@ function App() {
       }}
     >
       <AntApp>
-        {isLoggedIn ? (
-          <DashboardPage onLogout={handleLogout} />
-        ) : (
-          <LoginPage onLogin={handleLogin} />
-        )}
+        <AppRouter />
       </AntApp>
     </ConfigProvider>
   );

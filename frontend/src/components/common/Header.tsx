@@ -8,7 +8,7 @@ import {
   SettingOutlined,
   BellOutlined,
 } from '@ant-design/icons';
-import { useAuth } from '../../hooks';
+import useAuthSimple from '../../hooks/auth/useAuthSimple';
 
 const { Header: AntHeader } = Layout;
 const { Text } = Typography;
@@ -19,7 +19,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ collapsed, onToggle }) => {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthSimple();
 
   const userMenuItems = [
     {

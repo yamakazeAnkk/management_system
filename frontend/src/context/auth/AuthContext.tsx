@@ -11,6 +11,7 @@ interface AuthState {
 
 interface AuthContextType extends AuthState {
   login: (user: User, token: string) => void;
+  loginWithCredentials: (credentials: { username: string; password: string }) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -101,6 +102,42 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     dispatch({ type: 'LOGIN', payload: { user, token } });
   };
 
+  const loginWithCredentials = async (credentials: { username: string; password: string }) => {
+    setLoading(true);
+    clearError();
+    
+    try {
+      // Mock login API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      if (credentials.username === 'admin' && credentials.password === 'admin') {
+        const token = 'mock_jwt_token_' + Date.now();
+        const user: User = {
+          id: '1',
+          username: 'admin',
+          email: 'admin@example.com',
+          firstName: 'Admin',
+          lastName: 'User',
+          phone: '0123456789',
+          isActive: true,
+          roles: [],
+          department: null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        
+        login(user, token);
+        return { success: true };
+      } else {
+        return { success: false, error: 'Tên đăng nhập hoặc mật khẩu không đúng' };
+      }
+    } catch {
+      return { success: false, error: 'Đăng nhập thất bại' };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('user_data');
@@ -123,6 +160,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const value: AuthContextType = {
     ...state,
     login,
+    loginWithCredentials,
     logout,
     setLoading,
     setError,

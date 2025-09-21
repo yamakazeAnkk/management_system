@@ -1,5 +1,8 @@
 import React from 'react';
 import { Row, Col, Statistic, Card, Table, Tag, Space, Button, Typography, Layout } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import useAuthSimple from '../../hooks/auth/useAuthSimple';
+import { ROUTES } from '../../constants/routes/paths';
 import {
   UserOutlined,
   TeamOutlined,
@@ -11,11 +14,14 @@ import {
   LogoutOutlined,
 } from '@ant-design/icons';
 
-interface DashboardPageProps {
-  onLogout?: () => void;
-}
+const DashboardPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { logout } = useAuthSimple();
 
-const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
+  const handleLogout = () => {
+    logout();
+    navigate(ROUTES.LOGIN);
+  };
   // Mock data
   const statistics = [
     {
@@ -143,14 +149,14 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onLogout }) => {
           <Typography.Title level={1} style={{ margin: 0 }}>
             Dashboard
           </Typography.Title>
-          <Button 
-            type="primary" 
-            danger 
-            icon={<LogoutOutlined />}
-            onClick={onLogout}
-          >
-            Đăng xuất
-          </Button>
+                 <Button
+                   type="primary"
+                   danger
+                   icon={<LogoutOutlined />}
+                   onClick={handleLogout}
+                 >
+                   Đăng xuất
+                 </Button>
         </div>
         
         {/* Statistics Cards */}

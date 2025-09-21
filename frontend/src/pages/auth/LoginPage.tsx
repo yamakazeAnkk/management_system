@@ -1,41 +1,32 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Card, Typography, Alert, Space, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import RegisterPage from './RegisterPage';
+import { useNavigate, Link } from 'react-router-dom';
+import useAuthSimple from '../../hooks/auth/useAuthSimple';
+import { ROUTES } from '../../constants/routes/paths';
 import './auth.css';
 
 const { Title, Text } = Typography;
 
-interface LoginPageProps {
-  onLogin?: () => void;
-}
-
-const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
+const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showRegister, setShowRegister] = useState(false);
   const [form] = Form.useForm();
-  
-  // Mock login function
+  const navigate = useNavigate();
+  const { loginWithCredentials } = useAuthSimple();
 
   const handleSubmit = async (values: { username: string; password: string }) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Mock login logic
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const result = await loginWithCredentials(values);
       
-      if (values.username === 'admin' && values.password === 'admin') {
+      if (result.success) {
         message.success('Đăng nhập thành công!');
-        // Chuyển sang dashboard
-        setTimeout(() => {
-          if (onLogin) {
-            onLogin();
-          }
-        }, 1000);
+        navigate(ROUTES.DASHBOARD);
       } else {
-        setError('Tên đăng nhập hoặc mật khẩu không đúng');
+        setError(result.error || 'Đăng nhập thất bại');
       }
     } catch {
       setError('Đăng nhập thất bại');
@@ -43,11 +34,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
       setIsLoading(false);
     }
   };
-
-  // Nếu đang hiển thị trang đăng ký
-  if (showRegister) {
-    return <RegisterPage onBackToLogin={() => setShowRegister(false)} />;
-  }
 
   return (
     <div className="auth-container">
@@ -70,7 +56,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
               showIcon
             />
           )}
-
+          
           <Form
             form={form}
             name="login"
@@ -90,7 +76,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                 placeholder="Nhập tên đăng nhập"
               />
             </Form.Item>
-
+            
             <Form.Item
               name="password"
               label="Mật khẩu"
@@ -103,7 +89,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                 placeholder="Nhập mật khẩu"
               />
             </Form.Item>
-
+            
             <Form.Item>
               <Button
                 type="primary"
@@ -112,7 +98,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                 block
                 size="large"
               >
-                       {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
               </Button>
             </Form.Item>
           </Form>
@@ -120,13 +106,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           <div style={{ textAlign: 'center' }}>
             <Text type="secondary">
               Chưa có tài khoản?{' '}
-              <Button 
-                type="link" 
-                style={{ padding: 0 }}
-                onClick={() => setShowRegister(true)}
-              >
-                Đăng ký ngay
-              </Button>
+              <Link to={ROUTES.REGISTER}>
+                <Button type="link" style={{ padding: 0 }}>
+                  Đăng ký ngay
+                </Button>
+              </Link>
             </Text>
           </div>
         </Space>
