@@ -18,5 +18,5 @@ type User struct {
 	IsActive      bool       `bson:"isActive"`
 	CreatedAt     time.Time  `bson:"createdAt"`
 	UpdatedAt     time.Time  `bson:"updatedAt"`
-	Roles         []UserRole `bson:"roles"` // embedded
+	Roles         []UserRole `bson:"roles"` // embedded - không cần bảng riêng
 }

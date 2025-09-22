@@ -1,12 +1,13 @@
 package model
 
 import (
-	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type UUID = string
+// UUID is an alias to MongoDB's ObjectID for convenience across models
+type UUID = primitive.ObjectID
 
 func NewUUID() UUID {
-	return  uuid.New().String()
-	
+	return primitive.NewObjectID()
+
 }

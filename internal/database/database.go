@@ -88,14 +88,23 @@ func New() Service {
 	}
 	// Do not ping at startup to avoid blocking the server
 
-	// Get database name from URI or use default
-	dbName := "management_system" // Default database name
-	if uri != "" && strings.Contains(uri, "/") {
-		parts := strings.Split(uri, "/")
-		if len(parts) > 3 && strings.Contains(parts[3], "?") {
-			dbName = strings.Split(parts[3], "?")[0]
-		} else if len(parts) > 3 {
-			dbName = parts[3]
+	// Choose database name: prefer DB_NAME env, then name in URI, else fallback
+	dbName := os.Getenv("DB_NAME")
+	if dbName == "" {
+		dbName = "management_system" // fallback default
+	}
+	// If DB_NAME not set, try to parse from URI
+	if os.Getenv("DB_NAME") == "" {
+		if uri != "" && strings.Contains(uri, "/") {
+			parts := strings.Split(uri, "/")
+			if len(parts) > 3 && strings.Contains(parts[3], "?") {
+				parsed := strings.Split(parts[3], "?")[0]
+				if parsed != "" {
+					dbName = parsed
+				}
+			} else if len(parts) > 3 && parts[3] != "" {
+				dbName = parts[3]
+			}
 		}
 	}
 
