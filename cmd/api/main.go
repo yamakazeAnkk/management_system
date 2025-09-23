@@ -1,5 +1,10 @@
 package main
 
+// @title           Management System API
+// @version         1.0
+// @description     API documentation for Management System
+// @BasePath        /
+
 import (
 	"context"
 	"fmt"

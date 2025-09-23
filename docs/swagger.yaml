@@ -1,4 +1,160 @@
+basePath: /
+definitions:
+  model.Role:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      isActive:
+        type: boolean
+      isSystem:
+        type: boolean
+      name:
+        type: string
+      permissionKeys:
+        description: 'ví dụ: ["employee.read","employee.write"]'
+        items:
+          type: string
+        type: array
+      updatedAt:
+        type: string
+    type: object
 info:
   contact: {}
-paths: {}
+  description: API documentation for Management System
+  title: Management System API
+  version: "1.0"
+paths:
+  /roles:
+    get:
+      parameters:
+      - description: limit
+        in: query
+        name: limit
+        type: integer
+      - description: offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List roles
+      tags:
+      - roles
+    post:
+      consumes:
+      - application/json
+      description: Tạo role mới
+      parameters:
+      - description: Role payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.Role'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Role'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create role
+      tags:
+      - roles
+  /roles/{id}:
+    delete:
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete role
+      tags:
+      - roles
+    get:
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Role'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get role by id
+      tags:
+      - roles
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Role payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.Role'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Role'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update role
+      tags:
+      - roles
 swagger: "2.0"

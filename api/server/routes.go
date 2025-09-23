@@ -9,7 +9,6 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"management_system/api/handler"
 	"management_system/internal/repository/mongodb"
 	"management_system/internal/service"
 )
@@ -74,15 +73,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	roleCol := s.db.GetDatabase().Collection("roles")
 	roleRepo := mongodb.NewRoleRepository(roleCol)
 	roleSvc := service.NewRoleService(roleRepo)
-	roleH := handler.NewRoleHandler(roleSvc)
-	roles := r.Group("/roles")
-	{
-		roles.GET("", roleH.List)
-		roles.POST("", roleH.Create)
-		roles.GET("/:id", roleH.GetByID)
-		roles.PUT("/:id", roleH.Update)
-		roles.DELETE("/:id", roleH.Delete)
-	}
+	RegisterRoleRoutes(r, roleSvc)
 
 	return r
 }
