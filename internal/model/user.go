@@ -18,5 +18,6 @@ type User struct {
 	IsActive      bool       `bson:"isActive"`
 	CreatedAt     time.Time  `bson:"createdAt"`
 	UpdatedAt     time.Time  `bson:"updatedAt"`
+	AvatarURL     *string    `bson:"avatarUrl,omitempty"`
 	Roles         []UserRole `bson:"roles"` // embedded - không cần bảng riêng
 }

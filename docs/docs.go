@@ -15,6 +15,128 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/auth/login": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Login",
+                "parameters": [
+                    {
+                        "description": "Credentials",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/interfaces.LoginInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/interfaces.TokenPair"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Logout",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Refresh token",
+                        "name": "refreshToken",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Refresh token",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Refresh token",
+                        "name": "refreshToken",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/interfaces.TokenPair"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Register",
+                "parameters": [
+                    {
+                        "description": "Register",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/interfaces.RegisterInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/roles": {
             "get": {
                 "description": "Lấy danh sách roles với phân trang và filter",
@@ -257,6 +379,45 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "interfaces.LoginInput": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "interfaces.RegisterInput": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "fullName": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "interfaces.TokenPair": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "refreshToken": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Role": {
             "type": "object",
             "properties": {
@@ -300,7 +461,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Management System API",
-	Description:      "API documentation for Management System",
+	Description:      "API documentation for Management System\n# Error codes\n### <span style=\"font-size:18px\">- <code>120001</code>: Wrong pagination query</span>\n### <span style=\"font-size:18px\">- <code>120002</code>: Wrong query</span>\n### <span style=\"font-size:18px\">- <code>120003</code>: Wrong body</span>\n### <span style=\"font-size:18px\">- <code>121101</code>: Email template not found</span>\n### <span style=\"font-size:18px\">- <code>121204</code>: Invalid order</span>\n### <span style=\"font-size:18px\">- <code>121205</code>: Email template ID is missing</span>\n### <span style=\"font-size:18px\">- <code>121206</code>: Invalid email template ID</span>\n### <span style=\"font-size:18px\">- <code>121207</code>: Email template not found</span>\n### <span style=\"font-size:18px\">- <code>121208</code>: Stage not found</span>\n### <span style=\"font-size:18px\">- <code>121301</code>: Reject reason not found</span>\n### <span style=\"font-size:18px\">- <code>121401</code>: Question set not found</span>\n### <span style=\"font-size:18px\">- <code>121501</code>: Hiring team not found</span>\n### <span style=\"font-size:18px\">- <code>121502</code>: User not found</span>\n### <span style=\"font-size:18px\">- <code>122101</code>: Position not found</span>\n### <span style=\"font-size:18px\">- <code>122201</code>: Required field</span>\n### <span style=\"font-size:18px\">- <code>122202</code>: Stage not found</span>\n### <span style=\"font-size:18px\">- <code>122203</code>: Black list or duplicate</span>\n### <span style=\"font-size:18px\">- <code>122204</code>: Pool not found</span>\n### <span style=\"font-size:18px\">- <code>122205</code>: Candidate not found</span>\n### <span style=\"font-size:18px\">- <code>122301</code>: Label not found</span>",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

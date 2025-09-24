@@ -1,5 +1,30 @@
 basePath: /
 definitions:
+  interfaces.LoginInput:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  interfaces.RegisterInput:
+    properties:
+      email:
+        type: string
+      fullName:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  interfaces.TokenPair:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+    type: object
   model.Role:
     properties:
       createdAt:
@@ -24,10 +49,110 @@ definitions:
     type: object
 info:
   contact: {}
-  description: API documentation for Management System
+  description: |-
+    API documentation for Management System
+    # Error codes
+    ### <span style="font-size:18px">- <code>120001</code>: Wrong pagination query</span>
+    ### <span style="font-size:18px">- <code>120002</code>: Wrong query</span>
+    ### <span style="font-size:18px">- <code>120003</code>: Wrong body</span>
+    ### <span style="font-size:18px">- <code>121101</code>: Email template not found</span>
+    ### <span style="font-size:18px">- <code>121204</code>: Invalid order</span>
+    ### <span style="font-size:18px">- <code>121205</code>: Email template ID is missing</span>
+    ### <span style="font-size:18px">- <code>121206</code>: Invalid email template ID</span>
+    ### <span style="font-size:18px">- <code>121207</code>: Email template not found</span>
+    ### <span style="font-size:18px">- <code>121208</code>: Stage not found</span>
+    ### <span style="font-size:18px">- <code>121301</code>: Reject reason not found</span>
+    ### <span style="font-size:18px">- <code>121401</code>: Question set not found</span>
+    ### <span style="font-size:18px">- <code>121501</code>: Hiring team not found</span>
+    ### <span style="font-size:18px">- <code>121502</code>: User not found</span>
+    ### <span style="font-size:18px">- <code>122101</code>: Position not found</span>
+    ### <span style="font-size:18px">- <code>122201</code>: Required field</span>
+    ### <span style="font-size:18px">- <code>122202</code>: Stage not found</span>
+    ### <span style="font-size:18px">- <code>122203</code>: Black list or duplicate</span>
+    ### <span style="font-size:18px">- <code>122204</code>: Pool not found</span>
+    ### <span style="font-size:18px">- <code>122205</code>: Candidate not found</span>
+    ### <span style="font-size:18px">- <code>122301</code>: Label not found</span>
   title: Management System API
   version: "1.0"
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/interfaces.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/interfaces.TokenPair'
+      summary: Login
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      parameters:
+      - description: Refresh token
+        in: query
+        name: refreshToken
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+      summary: Logout
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Refresh token
+        in: query
+        name: refreshToken
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/interfaces.TokenPair'
+      summary: Refresh token
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Register
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/interfaces.RegisterInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+      summary: Register
+      tags:
+      - auth
   /roles:
     get:
       description: Lấy danh sách roles với phân trang và filter

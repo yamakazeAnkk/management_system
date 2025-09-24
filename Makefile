@@ -20,8 +20,8 @@ swag-install:
 	@go install github.com/swaggo/swag/cmd/swag@latest
 
 swag-init:
-	@echo "Generating Swagger docs..."
-	@swag init -g cmd/api/main.go -d . -o ./docs
+	@`go env GOPATH`/bin/swag init -g cmd/api/main.go -d . -o ./docs
+	
 
 # Run backend only
 run-backend:		

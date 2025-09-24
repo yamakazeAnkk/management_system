@@ -3,6 +3,27 @@ package main
 // @title           Management System API
 // @version         1.0
 // @description     API documentation for Management System
+// @description     ## Error codes
+// @description     - `120001`: Wrong pagination query
+// @description     - `120002`: Wrong query
+// @description     - `120003`: Wrong body
+// @description     - `121101`: Email template not found
+// @description     - `121204`: Invalid order
+// @description     - `121205`: Email template ID is missing
+// @description     - `121206`: Invalid email template ID
+// @description     - `121207`: Email template not found
+// @description     - `121208`: Stage not found
+// @description     - `121301`: Reject reason not found
+// @description     - `121401`: Question set not found
+// @description     - `121501`: Hiring team not found
+// @description     - `121502`: User not found
+// @description     - `122101`: Position not found
+// @description     - `122201`: Required field
+// @description     - `122202`: Stage not found
+// @description     - `122203`: Black list or duplicate
+// @description     - `122204`: Pool not found
+// @description     - `122205`: Candidate not found
+// @description     - `122301`: Label not found
 // @BasePath        /
 
 import (

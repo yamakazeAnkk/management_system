@@ -9,12 +9,18 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
+	"management_system/api/handler"
+	"management_system/api/middleware"
+	"management_system/internal/model"
 	"management_system/internal/repository/mongodb"
 	"management_system/internal/service"
+	authutil "management_system/internal/util/auth"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
-	r := gin.Default()
+	r := gin.New()
+	r.Use(gin.Logger(), gin.Recovery())
+	r.Use(middleware.ErrorHandler())
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:5173"}, // Add your frontend URL
@@ -69,11 +75,66 @@ func (s *Server) RegisterRoutes() http.Handler {
 		c.JSON(http.StatusCreated, gin.H{"insertedId": res.InsertedID})
 	})
 
+	// Debug: seed admin user for login testing
+	r.POST("/debug/seed-admin", func(c *gin.Context) {
+		col := s.db.GetDatabase().Collection("users")
+		username := "admin"
+		// check exists
+		var exists model.User
+		err := col.FindOne(c.Request.Context(), map[string]any{"username": username}).Decode(&exists)
+		if err == nil {
+			c.JSON(http.StatusOK, gin.H{"message": "admin already exists"})
+			return
+		}
+		hash, err := authutil.HashPassword("admin")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		u := model.User{
+			ID:           model.NewUUID(),
+			Username:     username,
+			PasswordHash: hash,
+			FullName:     "Administrator",
+			IsActive:     true,
+			CreatedAt:    time.Now(),
+			UpdatedAt:    time.Now(),
+			Roles:        []model.UserRole{},
+		}
+		if _, err := col.InsertOne(c.Request.Context(), u); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusCreated, gin.H{"message": "seeded admin/admin"})
+	})
+
 	// Role routes
 	roleCol := s.db.GetDatabase().Collection("roles")
 	roleRepo := mongodb.NewRoleRepository(roleCol)
 	roleSvc := service.NewRoleService(roleRepo)
 	RegisterRoleRoutes(r, roleSvc)
+
+	// Auth routes
+	userRepo := mongodb.NewUserRepository(s.db.GetDatabase().Collection("users"))
+	rtRepo := mongodb.NewRefreshTokenRepository(s.db.GetDatabase().Collection("refresh_tokens"))
+	authSvc := service.NewAuthService(userRepo, rtRepo)
+	authH := handler.NewAuthHandler(authSvc)
+	auth := r.Group("/auth")
+	{
+		auth.POST("/register", authH.Register)
+		auth.POST("/login", authH.Login)
+		auth.POST("/refresh", authH.Refresh)
+		auth.POST("/logout", authH.Logout)
+	}
+
+	// Protected example
+	protected := r.Group("/api", middleware.JWTAuth())
+	{
+		protected.GET("/me", func(c *gin.Context) {
+			uid, _ := c.Get("uid")
+			c.JSON(http.StatusOK, gin.H{"userId": uid})
+		})
+	}
 
 	return r
 }
