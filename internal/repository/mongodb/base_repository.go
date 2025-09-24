@@ -8,6 +8,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"management_system/internal/util"
 )
 
 type MongoBaseRepository[T any] struct {
@@ -22,6 +24,12 @@ func (r *MongoBaseRepository[T]) Create(ctx context.Context, data T) error {
 	if r.col == nil {
 		return errors.New("collection is nil")
 	}
+
+	// Set defaults using mapper
+	if err := util.SetDefaults(&data); err != nil {
+		return err
+	}
+
 	_, err := r.col.InsertOne(ctx, data)
 	return err
 }
@@ -49,11 +57,19 @@ func (r *MongoBaseRepository[T]) Update(ctx context.Context, id string, data T) 
 	if r.col == nil {
 		return errors.New("collection is nil")
 	}
+
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return errors.New("invalid id")
 	}
-	res, err := r.col.UpdateOne(ctx, bson.M{"_id": oid}, bson.M{"$set": data})
+
+	// Set update defaults and remove ID field
+	if err := util.SetUpdateDefaults(&data); err != nil {
+		return err
+	}
+	updateDoc := util.RemoveID(&data)
+
+	res, err := r.col.UpdateOne(ctx, bson.M{"_id": oid}, bson.M{"$set": updateDoc})
 	if err != nil {
 		return err
 	}

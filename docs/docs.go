@@ -17,6 +17,7 @@ const docTemplate = `{
     "paths": {
         "/roles": {
             "get": {
+                "description": "Lấy danh sách roles với phân trang và filter",
                 "produces": [
                     "application/json"
                 ],
@@ -26,21 +27,39 @@ const docTemplate = `{
                 "summary": "List roles",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "limit",
-                        "name": "limit",
+                        "type": "string",
+                        "description": "Filter by role name",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "active",
+                            "inactive"
+                        ],
+                        "type": "string",
+                        "description": "Filter by status",
+                        "name": "status",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "offset",
-                        "name": "offset",
+                        "default": 1,
+                        "description": "Trang hiện tại (bắt đầu từ 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Số bản ghi mỗi trang",
+                        "name": "limit",
                         "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "{ items: Role[], meta: { count,current_page,per_page,total,total_pages } }",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -101,13 +120,14 @@ const docTemplate = `{
         },
         "/roles/{id}": {
             "get": {
+                "description": "Lấy thông tin role theo ID",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "roles"
                 ],
-                "summary": "Get role by id",
+                "summary": "Get role by ID",
                 "parameters": [
                     {
                         "type": "string",
@@ -124,6 +144,15 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.Role"
                         }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Not Found",
                         "schema": {
@@ -136,6 +165,7 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "description": "Cập nhật thông tin role",
                 "consumes": [
                     "application/json"
                 ],
@@ -179,10 +209,20 @@ const docTemplate = `{
                                 "type": "string"
                             }
                         }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
                     }
                 }
             },
             "delete": {
+                "description": "Xóa role theo ID",
                 "tags": [
                     "roles"
                 ],
@@ -198,7 +238,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content"
+                        "description": "No Content",
+                        "schema": {
+                            "type": "string"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",

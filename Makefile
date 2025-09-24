@@ -15,6 +15,14 @@ run:
 	@npm install --prefer-offline --no-fund --prefix ./frontend
 	@npm run dev --prefix ./frontend
 
+swag-install:
+	@echo "Installing swag CLI..."
+	@go install github.com/swaggo/swag/cmd/swag@latest
+
+swag-init:
+	@echo "Generating Swagger docs..."
+	@swag init -g cmd/api/main.go -d . -o ./docs
+
 # Run backend only
 run-backend:		
 	@go run cmd/api/main.go
