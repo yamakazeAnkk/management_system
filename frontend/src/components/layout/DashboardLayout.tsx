@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Layout, Button } from 'antd';
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { Layout } from 'antd';
 import { Outlet } from 'react-router-dom';
-import Header from '../common/Header';
-import Sidebar from '../common/Sidebar';
+import Header from '../navbar/Header';
+import { Sidebar } from '../sidebar';
 
 const { Content } = Layout;
 
@@ -15,18 +14,20 @@ const DashboardLayout: React.FC = () => {
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Sidebar collapsed={collapsed} />
-      <Layout>
+    <Layout style={{ height: '100vh', overflow: 'hidden' }}>
+      <Sidebar />
+      <Layout style={{ overflow: 'hidden' }}>
         <Header 
           collapsed={collapsed} 
           onToggle={toggleCollapsed}
         />
         <Content style={{ 
-          margin: '24px 16px', 
+          // margin: '24px 16px', 
           padding: 24, 
           background: '#fff',
           minHeight: 280,
+          overflow: 'auto',
+          flex: 1,
         }}>
           <Outlet />
         </Content>

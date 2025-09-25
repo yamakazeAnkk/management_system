@@ -1,6 +1,6 @@
 // Common components
-export { default as Header } from './common/Header';
-export { default as Sidebar } from './common/Sidebar';
+export { Header } from './navbar';
+export { Sidebar } from './sidebar';
 export { default as Footer } from './common/Footer';
 export { default as LoadingSpinner } from './common/LoadingSpinner';
 export { default as ErrorBoundary } from './common/ErrorBoundary';

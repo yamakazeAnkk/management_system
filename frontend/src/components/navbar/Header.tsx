@@ -1,8 +1,6 @@
 import React from 'react';
 import { Layout, Avatar, Dropdown, Button, Space, Typography } from 'antd';
 import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
   UserOutlined,
   LogoutOutlined,
   SettingOutlined,
@@ -13,12 +11,12 @@ import useAuthSimple from '../../hooks/auth/useAuthSimple';
 const { Header: AntHeader } = Layout;
 const { Text } = Typography;
 
-interface HeaderProps {
+export interface HeaderProps {
   collapsed: boolean;
   onToggle: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ collapsed, onToggle }) => {
+const Header: React.FC<HeaderProps> = () => {
   const { user, logout } = useAuthSimple();
 
   const userMenuItems = [
@@ -51,17 +49,10 @@ const Header: React.FC<HeaderProps> = ({ collapsed, onToggle }) => {
       alignItems: 'center',
       justifyContent: 'space-between',
       boxShadow: '0 1px 4px rgba(0, 21, 41, 0.08)',
+      position: 'sticky',
+      top: 0,
+      zIndex: 1,
     }}>
-      <Button
-        type="text"
-        icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-        onClick={onToggle}
-        style={{
-          fontSize: '16px',
-          width: 64,
-          height: 64,
-        }}
-      />
       
       <Space size="middle">
         <Button type="text" icon={<BellOutlined />} />
@@ -75,7 +66,6 @@ const Header: React.FC<HeaderProps> = ({ collapsed, onToggle }) => {
             <Avatar 
               size="small" 
               icon={<UserOutlined />} 
-              src={user?.avatar}
             />
             <Text strong>{user?.firstName} {user?.lastName}</Text>
           </Space>
@@ -86,3 +76,5 @@ const Header: React.FC<HeaderProps> = ({ collapsed, onToggle }) => {
 };
 
 export default Header;
+
+

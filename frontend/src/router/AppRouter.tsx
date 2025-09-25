@@ -22,13 +22,14 @@ import CreateDepartmentPage from '../pages/departments/CreateDepartmentPage';
 import EditDepartmentPage from '../pages/departments/EditDepartmentPage';
 import ProfilePage from '../pages/profile/ProfilePage';
 import SettingsPage from '../pages/profile/SettingsPage';
+import { AllEmployee } from '../pages/employees/index';
 
 // Layouts
 import AuthLayout from '../components/layout/AuthLayout';
 import DashboardLayout from '../components/layout/DashboardLayout';
 
 // Protected Route Component
-import ProtectedRoute from './ProtectedRoute';
+import ProtectedRoute from '../router/ProtectedRoute';
 
 const AppRouter: React.FC = () => {
   return (
@@ -87,6 +88,18 @@ const AppRouter: React.FC = () => {
           <Route path=":id" element={<DepartmentDetailPage />} />
           <Route path=":id/edit" element={<EditDepartmentPage />} />
         </Route>
+
+        {/* Employees */}
+        <Route path="/employees" element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<AllEmployee />} />
+        </Route>
+
+        {/* Legacy/typo redirect */}
+        <Route path="/employee" element={<Navigate to="/employees" replace />} />
 
         {/* Profile Routes */}
         <Route path="/profile" element={

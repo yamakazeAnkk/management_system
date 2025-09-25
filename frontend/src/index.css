@@ -1,5 +1,6 @@
 /* Import Ant Design styles */
 @import 'antd/dist/reset.css';
+@import './styles/globals/variables.css';
 
 /* Global styles */
 * {
@@ -10,15 +11,17 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
+  overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 1.5715;
-  color: rgba(0, 0, 0, 0.85);
-  background-color: #f0f2f5;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-muted);
 }
 
 #root {
-  height: 100%;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* Custom scrollbar */
@@ -85,22 +88,22 @@ html, body {
 
 .ant-layout-header {
   padding: 0 24px;
-  background: #fff;
+  background: var(--color-surface);
   box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
 }
 
 .ant-layout-sider {
-  background: #fff;
+  background: var(--color-surface);
   box-shadow: 2px 0 8px rgba(0, 21, 41, 0.08);
 }
 
-.ant-layout-content {
+/* .ant-layout-content {
   margin: 24px 16px;
   padding: 24px;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
-}
+} */
 
 /* Login page styles */
 .login-container {
@@ -160,13 +163,13 @@ html, body {
 }
 
 .ant-btn-primary {
-  background: #1890ff;
-  border-color: #1890ff;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .ant-btn-primary:hover {
-  background: #40a9ff;
-  border-color: #40a9ff;
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
 }
 
 /* Card styles */
@@ -223,7 +226,46 @@ html, body {
 }
 
 .ant-menu-item-selected {
-  background-color: #e6f7ff;
+  background-color: var(--color-primary-light);
+}
+.app-sider .ant-menu-dark,
+.app-sider .ant-menu-dark .ant-menu-sub,
+.app-sider .ant-menu-dark .ant-menu-inline.ant-menu-sub {
+  background: var(--color-sidebar-bg);
+}
+
+.ant-menu-light .ant-menu-item-selected,
+.ant-menu-light .ant-menu-submenu-selected > .ant-menu-submenu-title {
+  background-color: var(--color-sidebar-selected) !important;
+  color: var(--color-sidebar-text) !important;
+}
+
+.app-sider .ant-menu-light .ant-menu-item:hover,
+.app-sider .ant-menu-light .ant-menu-submenu-title:hover,
+.app-sider .ant-menu-light .ant-menu-item-active {
+  background-color: var(--color-sidebar-hover);
+}
+
+/* Remove default antd hover shadow/active border in light menu */
+.app-sider .ant-menu-light .ant-menu-item:active,
+.app-sider .ant-menu-light .ant-menu-submenu-title:active {
+  background-color: var(--color-sidebar-selected);
+}
+
+/* Keep icons/text consistent on hover */
+.app-sider .ant-menu-light .ant-menu-item:hover .ant-menu-item-icon,
+.app-sider .ant-menu-light .ant-menu-item:hover .ant-menu-title-content {
+  color: var(--color-sidebar-text);
+}
+
+.ant-menu-light .ant-menu-item-selected .ant-menu-item-icon,
+.ant-menu-light .ant-menu-item-selected .ant-menu-title-content {
+  color: var(--color-sidebar-accent) !important;
+}
+
+.ant-menu-light .ant-menu-item .ant-menu-item-icon,
+.ant-menu-light .ant-menu-title-content {
+  color: var(--color-sidebar-text);
 }
 
 .ant-menu-item-selected .ant-menu-item-icon {

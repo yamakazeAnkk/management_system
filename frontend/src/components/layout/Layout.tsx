@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Layout as AntLayout, theme } from 'antd';
-import Header from '../common/Header';
-import Sidebar from '../common/Sidebar';
+import Header from '../navbar/Header';
+import { Sidebar } from '../sidebar';
 
 const { Content } = AntLayout;
 
@@ -17,7 +17,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <AntLayout style={{ minHeight: '100vh' }}>
-      <Sidebar collapsed={collapsed} />
+      <Sidebar />
       <AntLayout>
         <Header 
           collapsed={collapsed} 

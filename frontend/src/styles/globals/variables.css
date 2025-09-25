@@ -1,0 +1,25 @@
+:root {
+  /* Brand */
+  --color-primary: #1890ff;
+  --color-primary-hover: #40a9ff;
+  --color-primary-light: #e6f7ff;
+
+  /* Sidebar - light theme per design */
+  --color-sidebar-bg: #ffffff;
+  --color-sidebar-selected: #f5f5f5; /* selected item bg */
+  --color-sidebar-hover: #f7f7f7; /* hover item bg */
+  --color-sidebar-text: #111111; /* icons/text */
+  --color-sidebar-accent: #111111; /* icon accent in selected */
+  --color-sidebar-brand: #111111; /* black square behind logo */
+  --color-sidebar-border: #eaeaea; /* separators */
+
+  /* Surfaces */
+  --color-surface: #ffffff;
+  --color-surface-muted: #f5f5f5;
+
+  /* Text */
+  --color-text-primary: #111111;
+  --color-text-secondary: rgba(0, 0, 0, 0.5);
+}
+
+
