@@ -1,15 +1,10 @@
 import React from 'react';
-import { Layout, Avatar, Dropdown, Button, Space, Typography } from 'antd';
-import {
-  UserOutlined,
-  LogoutOutlined,
-  SettingOutlined,
-  BellOutlined,
-} from '@ant-design/icons';
-import useAuthSimple from '../../hooks/auth/useAuthSimple';
+import { Layout, Space } from 'antd';
+import SearchBar from './SearchBar';
+import NotificationDropdown from './NotificationDropdown';
+import UserAvatar from './UserAvatar';
 
 const { Header: AntHeader } = Layout;
-const { Text } = Typography;
 
 export interface HeaderProps {
   collapsed: boolean;
@@ -17,30 +12,6 @@ export interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = () => {
-  const { user, logout } = useAuthSimple();
-
-  const userMenuItems = [
-    {
-      key: 'profile',
-      icon: <UserOutlined />,
-      label: 'Thông tin cá nhân',
-    },
-    {
-      key: 'settings',
-      icon: <SettingOutlined />,
-      label: 'Cài đặt',
-    },
-    {
-      type: 'divider' as const,
-    },
-    {
-      key: 'logout',
-      icon: <LogoutOutlined />,
-      label: 'Đăng xuất',
-      onClick: logout,
-    },
-  ];
-
   return (
     <AntHeader style={{ 
       padding: '0 24px', 
@@ -54,22 +25,10 @@ const Header: React.FC<HeaderProps> = () => {
       zIndex: 1,
     }}>
       
-      <Space size="middle">
-        <Button type="text" icon={<BellOutlined />} />
-        
-        <Dropdown
-          menu={{ items: userMenuItems }}
-          placement="bottomRight"
-          arrow
-        >
-          <Space style={{ cursor: 'pointer' }}>
-            <Avatar 
-              size="small" 
-              icon={<UserOutlined />} 
-            />
-            <Text strong>{user?.firstName} {user?.lastName}</Text>
-          </Space>
-        </Dropdown>
+      <Space size="large">
+        <SearchBar />
+        <NotificationDropdown count={3} />
+        <UserAvatar />
       </Space>
     </AntHeader>
   );
