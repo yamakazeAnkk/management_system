@@ -13,7 +13,7 @@ export type NotificationItem = {
 const Notifications: React.FC = () => {
   const unreadCount = notifications.filter((n: NotificationItem) => n.unread).length;
   return (
-    <Col xs={24} sm={24} md={24} lg={7}>
+    <Col xs={24} sm={24} md={24} lg={8}>
       <Card
         title={
           <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

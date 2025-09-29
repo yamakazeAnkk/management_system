@@ -1,6 +1,7 @@
 import React from 'react';
-import { UserOutlined, ClockCircleOutlined, FileTextOutlined, DollarOutlined, PlusOutlined, CreditCardOutlined, BarChartOutlined, StarOutlined } from '@ant-design/icons';
-import type { StatItem } from './components/DashboardStats';
+import { UserOutlined, ClockCircleOutlined, FileTextOutlined, DollarOutlined, PlusOutlined, CreditCardOutlined, BarChartOutlined, StarOutlined, ApartmentOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+import type { StatItem } from './components/DashboardStats';    
+import { UsergroupDeleteOutlined } from '@ant-design/icons';
 import { NotificationItem } from './components/Notifications';
 
 export const statistics: StatItem[] = [
@@ -32,6 +33,30 @@ export const statistics: StatItem[] = [
     icon: <DollarOutlined style={{ color: '#111' }} />,
     color: '#111111',
   },
+  {
+    title: 'New Hires',
+    value: 5,
+    subtitle: 'This month',
+    icon: <UsergroupAddOutlined style={{ color: '#111' }} />,
+    color: '#111111',
+  },
+  {
+    title: 'Resignations',
+    value: 2,
+    subtitle: 'This month',
+    icon: <UsergroupDeleteOutlined style={{ color: '#111' }} />,
+    color: '#111111',
+  },{
+    title: 'Departments',
+    value: 8,
+    subtitle: 'Active divisions',
+    icon: <ApartmentOutlined style={{ color: '#111' }} />,
+    color: '#111111',
+  }
+  
+  
+  
+
 ];
   
 export type RecentActivity = { title: string; time: string };
