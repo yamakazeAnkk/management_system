@@ -1,144 +1,27 @@
 import React from 'react';
-import { Row, Col, Statistic, Card, Table, Tag, Space, Button, Typography, Layout } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import useAuthSimple from '../../hooks/auth/useAuthSimple';
-import { ROUTES } from '../../constants/routes/paths';
-import {
-  UserOutlined,
-  TeamOutlined,
-  SafetyOutlined,
-  BankOutlined,
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  LogoutOutlined,
-} from '@ant-design/icons';
+import { Row, Typography, Layout } from 'antd';
+
+
+import { statistics } from './Data';
+import DashboardStats, { StatItem } from './components/DashboardStats';
+import RecentActivities from './components/RecentActivities';
+import DepartmentOverview from './components/DepartmentOverview';
+import Notifications from './components/Notifications';
+import AttendanceTrends from './components/AttendanceTrends';
+import QuickActions from './components/QuickActions';
+import UpcomingEvents from './components/UpcomingEvents';
+import TopPerformers from './components/TopPerformers';
 
 const DashboardPage: React.FC = () => {
-  const navigate = useNavigate();
-  const { logout } = useAuthSimple();
+  
 
-  const handleLogout = () => {
-    logout();
-    navigate(ROUTES.LOGIN);
-  };
+
   // Mock data
-  const statistics = [
-    {
-      title: 'Tổng người dùng',
-      value: 1234,
-      icon: <UserOutlined style={{ color: '#1890ff' }} />,
-      color: '#1890ff',
-    },
-    {
-      title: 'Vai trò',
-      value: 8,
-      icon: <SafetyOutlined style={{ color: '#52c41a' }} />,
-      color: '#52c41a',
-    },
-    {
-      title: 'Phòng ban',
-      value: 12,
-      icon: <BankOutlined style={{ color: '#faad14' }} />,
-      color: '#faad14',
-    },
-    {
-      title: 'Hoạt động hôm nay',
-      value: 56,
-      icon: <TeamOutlined style={{ color: '#f5222d' }} />,
-      color: '#f5222d',
-    },
-  ];
-
-  const recentUsersColumns = [
-    {
-      title: 'Tên người dùng',
-      dataIndex: 'username',
-      key: 'username',
-    },
-    {
-      title: 'Họ tên',
-      key: 'fullName',
-      render: (_, record) => `${record.firstName} ${record.lastName}`,
-    },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-    },
-    {
-      title: 'Vai trò',
-      key: 'roles',
-      dataIndex: 'roles',
-      render: (roles) => (
-        <Space>
-          {roles.map((role) => (
-            <Tag key={role.id} color="blue">
-              {role.name}
-            </Tag>
-          ))}
-        </Space>
-      ),
-    },
-    {
-      title: 'Trạng thái',
-      dataIndex: 'isActive',
-      key: 'isActive',
-      render: (isActive: boolean) => (
-        <Tag color={isActive ? 'green' : 'red'}>
-          {isActive ? 'Hoạt động' : 'Không hoạt động'}
-        </Tag>
-      ),
-    },
-    {
-      title: 'Hành động',
-      key: 'action',
-      render: () => (
-        <Space size="middle">
-          <Button type="link" icon={<EditOutlined />} size="small">
-            Sửa
-          </Button>
-          <Button type="link" danger icon={<DeleteOutlined />} size="small">
-            Xóa
-          </Button>
-        </Space>
-      ),
-    },
-  ];
-
-  const recentUsersData = [
-    {
-      key: '1',
-      username: 'admin',
-      firstName: 'Nguyễn',
-      lastName: 'Văn A',
-      email: 'admin@example.com',
-      roles: [{ id: '1', name: 'Admin' }],
-      isActive: true,
-    },
-    {
-      key: '2',
-      username: 'user1',
-      firstName: 'Trần',
-      lastName: 'Thị B',
-      email: 'user1@example.com',
-      roles: [{ id: '2', name: 'User' }],
-      isActive: true,
-    },
-    {
-      key: '3',
-      username: 'manager1',
-      firstName: 'Lê',
-      lastName: 'Văn C',
-      email: 'manager1@example.com',
-      roles: [{ id: '3', name: 'Manager' }],
-      isActive: false,
-    },
-  ];
-
+  
+  
   return (
-    <Layout style={{ minHeight: '100vh', background: '#f0f2f5' }}>
-      <Layout.Content style={{ padding: '24px' }}>
+    <Layout style={{ background: 'transparent' }}>
+      <Layout.Content style={{ background: 'transparent' }}>
         <div>
         <div style={{ 
           display: 'flex', 
@@ -146,51 +29,34 @@ const DashboardPage: React.FC = () => {
           alignItems: 'center', 
           marginBottom: 24 
         }}>
-          <Typography.Title level={1} style={{ margin: 0 }}>
-            Dashboard
-          </Typography.Title>
-                 <Button
-                   type="primary"
-                   danger
-                   icon={<LogoutOutlined />}
-                   onClick={handleLogout}
-                 >
-                   Đăng xuất
-                 </Button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}> 
+            <Typography.Title level={1} style={{ margin: 0, fontWeight: 700, fontSize: '2rem', lineHeight: 1.2 }}>
+              Dashboard
+            </Typography.Title>
+            <Typography.Text style={{ color: '#6B7280', fontWeight: 400, fontSize: '1rem' }}>
+              Welcome back! Here's what's happening at your organization.
+            </Typography.Text>
+          </div>
         </div>
         
         {/* Statistics Cards */}
-        <Row gutter={16} style={{ marginBottom: 24 }}>
-          {statistics.map((stat, index) => (
-            <Col span={6} key={index}>
-              <Card>
-                <Statistic
-                  title={stat.title}
-                  value={stat.value}
-                  prefix={stat.icon}
-                  valueStyle={{ color: stat.color }}
-                />
-              </Card>
-            </Col>
-          ))}
-        </Row>
+        <DashboardStats statistics={statistics as StatItem[]} />
 
-        {/* Recent Users Table */}
-        <Card
-          title="Người dùng gần đây"
-          extra={
-            <Button type="primary" icon={<PlusOutlined />}>
-              Thêm người dùng
-            </Button>
-          }
-        >
-          <Table
-            columns={recentUsersColumns}
-            dataSource={recentUsersData}
-            pagination={{ pageSize: 5 }}
-            size="small"
-          />
-        </Card>
+        {/* Row 2: Recent Activities | Department Overview */}
+        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+          <RecentActivities />
+          <DepartmentOverview />
+        </Row>
+        {/* Row 3: Attendance Trends | Quick Actions */}
+        <Row gutter={[16, 16]}>
+          <AttendanceTrends />
+          <QuickActions />
+        </Row>
+        <Row gutter={[16, 16]}>
+          <UpcomingEvents />
+          <TopPerformers />
+          <Notifications />
+        </Row>
         </div>
       </Layout.Content>
     </Layout>

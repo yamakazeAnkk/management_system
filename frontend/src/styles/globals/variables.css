@@ -4,18 +4,18 @@
   --color-primary-hover: #40a9ff;
   --color-primary-light: #e6f7ff;
 
-  /* Sidebar - light theme per design */
-  --color-sidebar-bg: #ffffff;
-  --color-sidebar-selected: #f5f5f5; /* selected item bg */
-  --color-sidebar-hover: #f7f7f7; /* hover item bg */
-  --color-sidebar-text: #111111; /* icons/text */
-  --color-sidebar-accent: #111111; /* icon accent in selected */
-  --color-sidebar-brand: #111111; /* black square behind logo */
-  --color-sidebar-border: #eaeaea; /* separators */
+  /* Sidebar - dark theme */
+  --color-sidebar-bg: #0f1113; /* near-black background */
+  --color-sidebar-selected: #141414; /* selected item bg */
+  --color-sidebar-hover: #1f1f1f; /* hover item bg */
+  --color-sidebar-text: #ffffff; /* icons/text */
+  --color-sidebar-accent: #ffffff; /* icon/text when selected */
+  --color-sidebar-brand: #000000; /* logo square */
+  --color-sidebar-border: #303030; /* separators */
 
   /* Surfaces */
   --color-surface: #ffffff;
-  --color-surface-muted: #f5f5f5;
+  --color-surface-muted: #ffffff;
 
   /* Text */
   --color-text-primary: #111111;

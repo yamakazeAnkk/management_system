@@ -90,4 +90,44 @@ watch:
             fi; \
         fi
 
-.PHONY: all build run run-backend run-frontend stop-backend stop-frontend test clean watch docker-run docker-down itest
+# Debug commands
+debug-api:
+	@echo "Starting debug for API server..."
+	@dlv debug ./cmd/api/main.go --headless --listen=:2345 --api-version=2 --accept-multiclient
+
+debug-app:
+	@echo "Starting debug for App server..."
+	@dlv debug ./cmd/app/main.go --headless --listen=:2346 --api-version=2 --accept-multiclient
+
+debug-cli:
+	@echo "Starting debug for CLI..."
+	@dlv debug ./cmd/cli/main.go --headless --listen=:2347 --api-version=2 --accept-multiclient
+
+# Debug with breakpoints
+debug-api-interactive:
+	@echo "Starting interactive debug for API server..."
+	@dlv debug ./cmd/api/main.go
+
+debug-app-interactive:
+	@echo "Starting interactive debug for App server..."
+	@dlv debug ./cmd/app/main.go
+
+debug-cli-interactive:
+	@echo "Starting interactive debug for CLI..."
+	@dlv debug ./cmd/cli/main.go
+
+# Install delve debugger
+install-delve:
+	@echo "Installing Delve debugger..."
+	@go install github.com/go-delve/delve/cmd/dlv@latest
+	@echo "Delve installed successfully!"
+
+# Check if delve is installed
+check-delve:
+	@if command -v dlv > /dev/null; then \
+		echo "Delve is installed: $$(dlv version)"; \
+	else \
+		echo "Delve is not installed. Run 'make install-delve' to install it."; \
+	fi
+
+.PHONY: all build run run-backend run-frontend stop-backend stop-frontend test clean watch docker-run docker-down itest debug-api debug-app debug-cli debug-api-interactive debug-app-interactive debug-cli-interactive install-delve check-delve

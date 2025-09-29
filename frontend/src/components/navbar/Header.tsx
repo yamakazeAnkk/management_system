@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout, Space } from 'antd';
-import SearchBar from './SearchBar';
+// import SearchBar from './SearchBar';
 import NotificationDropdown from './NotificationDropdown';
 import UserAvatar from './UserAvatar';
 
@@ -15,7 +15,7 @@ const Header: React.FC<HeaderProps> = () => {
   return (
     <AntHeader style={{ 
       padding: '0 24px', 
-      background: '#fff',
+      background: 'var(--color-surface)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -23,13 +23,17 @@ const Header: React.FC<HeaderProps> = () => {
       position: 'sticky',
       top: 0,
       zIndex: 1,
+
     }}>
-      
-      <Space size="large">
+      {/* <div style={{ display: 'flex', alignItems: 'center' }}>
         <SearchBar />
-        <NotificationDropdown count={3} />
-        <UserAvatar />
-      </Space>
+      </div> */}
+      <div style={{ display: 'flex', alignItems: 'center', marginLeft: 'auto' }}>
+        <Space size="large">
+          <NotificationDropdown count={3} />
+          <UserAvatar />
+        </Space>
+      </div>
     </AntHeader>
   );
 };

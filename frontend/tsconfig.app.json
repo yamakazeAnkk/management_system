@@ -5,7 +5,6 @@
     "useDefineForClassFields": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "skipLibCheck": true,
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -13,16 +12,14 @@
     "verbatimModuleSyntax": false,
     "moduleDetection": "force",
     "noEmit": false,
-    "skipLibCheck": true,
     "jsx": "react-jsx",
+    "skipLibCheck": true,
 
     /* Linting */
     "strict": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "erasableSyntaxOnly": false,
-    "noFallthroughCasesInSwitch": false,
-    "noUncheckedSideEffectImports": false
+    "noFallthroughCasesInSwitch": false
   },
   "include": ["src"]
 }

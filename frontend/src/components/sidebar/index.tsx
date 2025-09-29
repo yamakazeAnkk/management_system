@@ -3,7 +3,6 @@ import { Layout, Button } from 'antd';
 import { RightOutlined, LeftOutlined } from '@ant-design/icons';
 import { SidebarNavigation } from './SidebarNavigation';
 import { SidebarHeader } from './SidebarHeader';
-import { SidebarFooter } from './SidebarFooter';
 
 const { Sider } = Layout;
 
@@ -29,7 +28,7 @@ export function Sidebar({ className }: SidebarProps) {
         top: 0,
         zIndex: 100,
         overflow: 'visible',
-        borderRight: '1px solid #4a637a'
+        borderRight: '1px solid var(--color-sidebar-border)'
       }}
     >
       <div style={{ position: 'absolute', right: -12, top: 32, transform: 'translateY(-50%)', zIndex: 200 }}>
@@ -45,18 +44,18 @@ export function Sidebar({ className }: SidebarProps) {
             justifyContent: 'center',
             borderColor: 'var(--color-sidebar-border)',
             color: 'var(--color-sidebar-text)',
-            background: '#fff',
+            background: 'var(--color-sidebar-hover)',
           }}
         />
       </div>
 
       <SidebarHeader isCollapsed={isCollapsed} />
 
-      <div style={{ height: 'calc(100vh - 16px - 64px - 72px)', overflowY: 'auto' }}>
+      <div style={{ height: 'calc(100vh - 64px)', overflowY: 'auto' }}>
         <SidebarNavigation isCollapsed={isCollapsed} />
       </div>
 
-      <SidebarFooter isCollapsed={isCollapsed} />
+   
     </Sider>
   );
 }

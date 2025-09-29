@@ -22,7 +22,7 @@ import CreateDepartmentPage from '../pages/departments/CreateDepartmentPage';
 import EditDepartmentPage from '../pages/departments/EditDepartmentPage';
 import ProfilePage from '../pages/profile/ProfilePage';
 import SettingsPage from '../pages/profile/SettingsPage';
-import { AllEmployee } from '../pages/employees/index';
+import { AllEmployeesPage } from '../pages/employees';
 
 // Layouts
 import AuthLayout from '../components/layout/AuthLayout';
@@ -95,7 +95,7 @@ const AppRouter: React.FC = () => {
             <DashboardLayout />
           </ProtectedRoute>
         }>
-          <Route index element={<AllEmployee />} />
+          <Route index element={<AllEmployeesPage />} />
         </Route>
 
         {/* Legacy/typo redirect */}

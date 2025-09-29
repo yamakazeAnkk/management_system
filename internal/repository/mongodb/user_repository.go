@@ -10,17 +10,12 @@ import (
 	repoif "management_system/internal/repository/interface"
 )
 
-type UserRepository interface {
-	repoif.BaseRepository[model.User]
-	FindByUsername(ctx context.Context, username string) (*model.User, error)
-}
-
 type userRepository struct {
 	*MongoBaseRepository[model.User]
 	col *mongo.Collection
 }
 
-func NewUserRepository(col *mongo.Collection) UserRepository {
+func NewUserRepository(col *mongo.Collection) repoif.UserRepository {
 	return &userRepository{MongoBaseRepository: NewMongoBaseRepository[model.User](col), col: col}
 }
 
@@ -32,3 +27,43 @@ func (r *userRepository) FindByUsername(ctx context.Context, username string) (*
 	}
 	return &u, nil
 }
+
+func (r *userRepository) ListByDepartmentId(ctx context.Context, departmentId string) ([]model.User, error) {
+	filter := bson.M{"departmentId": departmentId}
+	cursor, err := r.col.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var users []model.User
+	for cursor.Next(ctx) {
+		var user model.User
+		if err := cursor.Decode(&user); err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+	return users, nil
+}
+
+func (r *userRepository) ListByRoleId(ctx context.Context, roleId string) ([]model.User, error) {
+	filter := bson.M{"roles.roleId": roleId}
+	cursor, err := r.col.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var users []model.User
+	for cursor.Next(ctx) {
+		var user model.User
+		if err := cursor.Decode(&user); err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+	return users, nil
+}
+
+

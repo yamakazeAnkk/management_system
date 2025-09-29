@@ -12,7 +12,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const {
-    token: { colorBgContainer, borderRadiusLG },
+    token: { borderRadiusLG },
   } = theme.useToken();
 
   return (
@@ -28,7 +28,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             margin: '24px 16px',
             padding: 24,
             minHeight: 280,
-            background: colorBgContainer,
+            background:'var(--color-surface)',
             borderRadius: borderRadiusLG,
           }}
         >

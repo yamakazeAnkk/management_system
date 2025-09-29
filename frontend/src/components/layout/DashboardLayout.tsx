@@ -16,18 +16,18 @@ const DashboardLayout: React.FC = () => {
   return (
     <Layout style={{ height: '100vh', overflow: 'hidden' }}>
       <Sidebar />
-      <Layout style={{ overflow: 'hidden' }}>
+      <Layout style={{ overflow: 'hidden', background: 'var(--color-surface)' }}>
         <Header 
           collapsed={collapsed} 
           onToggle={toggleCollapsed}
         />
         <Content style={{ 
-          // margin: '24px 16px', 
-          padding: 24, 
-          background: '#fff',
+          padding: 24,
+         
           minHeight: 280,
           overflow: 'auto',
           flex: 1,
+          background: 'var(--color-surface)',
         }}>
           <Outlet />
         </Content>

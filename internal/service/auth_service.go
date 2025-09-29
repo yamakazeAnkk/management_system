@@ -15,12 +15,12 @@ import (
 )
 
 type authService struct {
-	users  mongodb.UserRepository
+	users  repoif.UserRepository
 	tokens mongodb.RefreshTokenRepository
 	base   repoif.BaseRepository[model.RefreshToken]
 }
 
-func NewAuthService(users mongodb.UserRepository, tokens mongodb.RefreshTokenRepository) sif.AuthService {
+func NewAuthService(users repoif.UserRepository, tokens mongodb.RefreshTokenRepository) sif.AuthService {
 	return &authService{users: users, tokens: tokens}
 }
 

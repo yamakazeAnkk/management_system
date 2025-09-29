@@ -51,27 +51,27 @@ info:
   contact: {}
   description: |-
     API documentation for Management System
-    # Error codes
-    ### <span style="font-size:18px">- <code>120001</code>: Wrong pagination query</span>
-    ### <span style="font-size:18px">- <code>120002</code>: Wrong query</span>
-    ### <span style="font-size:18px">- <code>120003</code>: Wrong body</span>
-    ### <span style="font-size:18px">- <code>121101</code>: Email template not found</span>
-    ### <span style="font-size:18px">- <code>121204</code>: Invalid order</span>
-    ### <span style="font-size:18px">- <code>121205</code>: Email template ID is missing</span>
-    ### <span style="font-size:18px">- <code>121206</code>: Invalid email template ID</span>
-    ### <span style="font-size:18px">- <code>121207</code>: Email template not found</span>
-    ### <span style="font-size:18px">- <code>121208</code>: Stage not found</span>
-    ### <span style="font-size:18px">- <code>121301</code>: Reject reason not found</span>
-    ### <span style="font-size:18px">- <code>121401</code>: Question set not found</span>
-    ### <span style="font-size:18px">- <code>121501</code>: Hiring team not found</span>
-    ### <span style="font-size:18px">- <code>121502</code>: User not found</span>
-    ### <span style="font-size:18px">- <code>122101</code>: Position not found</span>
-    ### <span style="font-size:18px">- <code>122201</code>: Required field</span>
-    ### <span style="font-size:18px">- <code>122202</code>: Stage not found</span>
-    ### <span style="font-size:18px">- <code>122203</code>: Black list or duplicate</span>
-    ### <span style="font-size:18px">- <code>122204</code>: Pool not found</span>
-    ### <span style="font-size:18px">- <code>122205</code>: Candidate not found</span>
-    ### <span style="font-size:18px">- <code>122301</code>: Label not found</span>
+    ## Error codes
+    - `120001`: Wrong pagination query
+    - `120002`: Wrong query
+    - `120003`: Wrong body
+    - `121101`: Email template not found
+    - `121204`: Invalid order
+    - `121205`: Email template ID is missing
+    - `121206`: Invalid email template ID
+    - `121207`: Email template not found
+    - `121208`: Stage not found
+    - `121301`: Reject reason not found
+    - `121401`: Question set not found
+    - `121501`: Hiring team not found
+    - `121502`: User not found
+    - `122101`: Position not found
+    - `122201`: Required field
+    - `122202`: Stage not found
+    - `122203`: Black list or duplicate
+    - `122204`: Pool not found
+    - `122205`: Candidate not found
+    - `122301`: Label not found
   title: Management System API
   version: "1.0"
 paths:

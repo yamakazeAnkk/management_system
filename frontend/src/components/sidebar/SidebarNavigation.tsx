@@ -119,7 +119,7 @@ export function SidebarNavigation({ isCollapsed }: SidebarNavigationProps) {
 
   return (
     <Menu
-      theme="light"
+      theme="dark"
       mode="inline"
       inlineCollapsed={isCollapsed}
       selectedKeys={selectedKey ? [selectedKey] : []}
