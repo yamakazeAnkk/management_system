@@ -2,6 +2,8 @@ import React from 'react';
 import { Table, Tag, Button, Avatar, Space } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { employeeProfiles } from '../Data';
+import { useNavigate } from 'react-router-dom';
 
 export interface EmployeeRow {
   key: string;
@@ -17,7 +19,6 @@ export interface EmployeeRow {
 }
 
 interface EmployeeTableProps {
-  employees: EmployeeRow[];
   selectedRowKeys: React.Key[];
   onSelectedChange: (keys: React.Key[]) => void;
 }
@@ -35,7 +36,22 @@ const getStatusStyle = (status: EmployeeRow['status']): React.CSSProperties => {
   }
 };
 
-const EmployeeTable: React.FC<EmployeeTableProps> = ({ employees, selectedRowKeys, onSelectedChange }) => {
+const EmployeeTable: React.FC<EmployeeTableProps> = ({ selectedRowKeys, onSelectedChange }) => {
+  const navigate = useNavigate();
+  // Prefer richer mock dataset from employeeProfiles as requested; map only needed fields
+  const dataRows: EmployeeRow[] = React.useMemo(() => {
+    return employeeProfiles.map((p, index) => ({
+      key: String(index + 1),
+      id: p.id,
+      name: p.name,
+      email: p.email,
+      phone: p.phone,
+      department: p.department,
+      position: p.position,
+      status: p.status,
+      joinDate: p.joinDate,
+    }))
+  }, [])
   const rowSelection = {
     selectedRowKeys,
     onChange: (newSelectedRowKeys: React.Key[]) => onSelectedChange(newSelectedRowKeys),
@@ -78,9 +94,9 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employees, selectedRowKey
     {
       title: 'ACTIONS',
       key: 'actions',
-      render: () => (
+      render: (_: unknown, record) => (
         <Space>
-          <Button type="text" icon={<EyeOutlined />} />
+          <Button type="text" icon={<EyeOutlined />} onClick={() => navigate(`/employees/${record.id}`)} />
           <Button type="text" icon={<EditOutlined />} />
           <Button type="text" danger icon={<DeleteOutlined />} />
         </Space>
@@ -93,7 +109,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employees, selectedRowKey
       rowSelection={rowSelection}
       pagination={false}
       columns={columns}
-      dataSource={employees}
+      dataSource={dataRows}
       bordered
       className="employee-table"
     />

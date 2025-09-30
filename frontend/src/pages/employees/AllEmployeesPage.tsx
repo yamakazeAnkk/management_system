@@ -16,9 +16,9 @@ import EmployeeFilter from "./components/Filter"
 import EmployeeListHeader, { ViewMode } from './components/EmployeeListHeader';
 import ExportButton from './components/ExportButton';
 import AddEmployeeButton from './components/AddEmployeeButton';
-import EmployeeTable, { EmployeeRow } from './components/EmployeeTable';
+import EmployeeTable from './components/EmployeeTable';
 import EmployeePagination from './components/EmployeePagination';
-import { initialEmployeeData } from './Data';
+import { employeeProfiles } from './Data';
 
 
 
@@ -29,26 +29,9 @@ import { initialEmployeeData } from './Data';
 
 
 export function AllEmployeesPage() {
-  
-
   const [viewMode, setViewMode] = useState<ViewMode>('list');
-
-
-  // Sample employee data
-  const initialData: EmployeeRow[] = initialEmployeeData.map((e, idx) => ({
-    key: String(idx + 1),
-    id: e.id,
-    name: e.name,
-    email: e.email,
-    phone: e.phone,
-    department: e.department,
-    position: e.position,
-    status: e.status as EmployeeRow['status'],
-    joinDate: e.joinDate,
-  }));
-
-  const [employees] = useState<EmployeeRow[]>(initialData)
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
+  const totalEmployees = employeeProfiles.length;
 
   
 
@@ -112,9 +95,9 @@ export function AllEmployeesPage() {
         </Col>
         <Col xs={24}>
           <Card bodyStyle={{ padding: 0 }}>
-            <EmployeeListHeader totalEmployees={employees.length} viewMode={viewMode} onChangeViewMode={setViewMode} />
-            <EmployeeTable employees={employees} selectedRowKeys={selectedRowKeys} onSelectedChange={setSelectedRowKeys} />
-            <EmployeePagination total={employees.length} current={1} />
+            <EmployeeListHeader totalEmployees={totalEmployees} viewMode={viewMode} onChangeViewMode={setViewMode} />
+            <EmployeeTable selectedRowKeys={selectedRowKeys} onSelectedChange={setSelectedRowKeys} />
+            <EmployeePagination total={totalEmployees} current={1} />
           </Card>
         </Col>
       </Row>
