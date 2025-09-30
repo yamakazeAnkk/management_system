@@ -151,6 +151,43 @@ html, body {
   background: #f5f5f5;
 }
 
+/* Center and colorize selection checkbox in employee table */
+.employee-table .ant-table-selection-column {
+  text-align: center !important;
+}
+.employee-table .ant-table-thead .ant-table-selection-column {
+  text-align: center !important;
+}
+.employee-table .ant-table-thead > tr > th.ant-table-selection-column,
+.employee-table .ant-table-tbody > tr > td.ant-table-selection-column {
+  text-align: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.employee-table .ant-table-selection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+.employee-table .ant-table-thead .ant-table-selection-column .ant-checkbox,
+.employee-table .ant-table-tbody .ant-table-selection-column .ant-checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.employee-table .ant-table-thead .ant-table-cell,
+.employee-table .ant-table-tbody .ant-table-cell {
+  vertical-align: middle;
+}
+.employee-table .ant-checkbox-inner {
+  border-color: #111111;
+}
+.employee-table .ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #111111;
+  border-color: #111111;
+}
+
 /* Form styles */
 .ant-form-item-label > label {
   font-weight: 500;
