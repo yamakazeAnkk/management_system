@@ -10,21 +10,15 @@ import {
 import { MailOutlined, DownloadOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons"
 
 
-import EmployeesStatsCards from './components/EmployeesStatsCards';
+import EmployeesStatsCards from './components/all/EmployeesStatsCards';
 
-import EmployeeFilter from "./components/Filter"
-import EmployeeListHeader, { ViewMode } from './components/EmployeeListHeader';
-import ExportButton from './components/ExportButton';
-import AddEmployeeButton from './components/AddEmployeeButton';
-import EmployeeTable from './components/EmployeeTable';
-import EmployeePagination from './components/EmployeePagination';
+import EmployeeFilter from "./components/all/Filter"
+import EmployeeListHeader, { ViewMode } from './components/all/EmployeeListHeader';
+import ExportButton from './components/all/ExportButton';
+import AddEmployeeButton from './components/all/AddEmployeeButton';
+import EmployeeTable from './components/all/EmployeeTable';
+import EmployeePagination from './components/all/EmployeePagination';
 import { employeeProfiles } from './Data';
-
-
-
-
-
-
 
 
 
@@ -33,18 +27,6 @@ export function AllEmployeesPage() {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
   const totalEmployees = employeeProfiles.length;
 
-  
-
-  // Table props moved to EmployeeTable component
-
- 
-  // const showModal = () => setIsModalVisible(true)
-
-
-
- 
-
-  // Table props moved to EmployeeTable component
 
   return (
     <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
@@ -80,7 +62,7 @@ export function AllEmployeesPage() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <ExportButton />
-          <AddEmployeeButton />
+          <AddEmployeeButton  />
         </div>
       </div>
       
@@ -96,7 +78,7 @@ export function AllEmployeesPage() {
         <Col xs={24}>
           <Card bodyStyle={{ padding: 0 }}>
             <EmployeeListHeader totalEmployees={totalEmployees} viewMode={viewMode} onChangeViewMode={setViewMode} />
-            <EmployeeTable selectedRowKeys={selectedRowKeys} onSelectedChange={setSelectedRowKeys} />
+            <EmployeeTable viewMode={viewMode} selectedRowKeys={selectedRowKeys} onSelectedChange={setSelectedRowKeys} />
             <EmployeePagination total={totalEmployees} current={1} />
           </Card>
         </Col>

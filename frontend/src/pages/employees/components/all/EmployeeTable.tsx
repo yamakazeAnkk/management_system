@@ -1,9 +1,10 @@
 import React from 'react';
-import { Table, Tag, Button, Avatar, Space } from 'antd';
+import { Table, Tag, Button, Avatar, Space, Card, Row, Col } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import { employeeProfiles } from '../Data';
+import { employeeProfiles } from '../../Data';
 import { useNavigate } from 'react-router-dom';
+import type { ViewMode } from './EmployeeListHeader';
 
 export interface EmployeeRow {
   key: string;
@@ -21,6 +22,7 @@ export interface EmployeeRow {
 interface EmployeeTableProps {
   selectedRowKeys: React.Key[];
   onSelectedChange: (keys: React.Key[]) => void;
+  viewMode: ViewMode;
 }
 
 const getStatusStyle = (status: EmployeeRow['status']): React.CSSProperties => {
@@ -36,7 +38,7 @@ const getStatusStyle = (status: EmployeeRow['status']): React.CSSProperties => {
   }
 };
 
-const EmployeeTable: React.FC<EmployeeTableProps> = ({ selectedRowKeys, onSelectedChange }) => {
+const EmployeeTable: React.FC<EmployeeTableProps> = ({ selectedRowKeys, onSelectedChange, viewMode }) => {
   const navigate = useNavigate();
   // Prefer richer mock dataset from employeeProfiles as requested; map only needed fields
   const dataRows: EmployeeRow[] = React.useMemo(() => {
@@ -103,6 +105,65 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ selectedRowKeys, onSelect
       ),
     },
   ]
+
+  if (viewMode === 'grid') {
+    return (
+      <div style={{ padding: 16 }}>
+        <Row gutter={[16, 16]}>
+          {dataRows.map((item) => {
+            const initials = (item.name || '')
+              .split(' ')
+              .map((n) => n[0])
+              .join('')
+              .toUpperCase()
+            return (
+              <Col key={item.id} xs={24} sm={12} md={12} lg={8} xl={6}>
+                <Card
+                  hoverable
+                  bodyStyle={{ padding: 16 }}
+                  actions={[
+                    <EyeOutlined key="view" onClick={() => navigate(`/employees/${item.id}`)} />,
+                    <EditOutlined key="edit" />,
+                    <DeleteOutlined key="delete" />,
+                  ]}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <Avatar size={48} style={{ background: '#111111', color: '#fff' }}>
+                      {item.avatar || initials}
+                    </Avatar>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 600 }}>{item.name}</div>
+                      <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {item.email}
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 12 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'rgba(0,0,0,0.45)' }}>Employee ID</span>
+                      <span>{item.id}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'rgba(0,0,0,0.45)' }}>Department</span>
+                      <span>{item.department}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'rgba(0,0,0,0.45)' }}>Position</span>
+                      <span>{item.position}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: 'rgba(0,0,0,0.45)' }}>Status</span>
+                      <Tag style={getStatusStyle(item.status)}>{item.status}</Tag>
+                    </div>
+                  </div>
+                </Card>
+              </Col>
+            )
+          })}
+        </Row>
+      </div>
+    )
+  }
 
   return (
     <Table

@@ -40,6 +40,15 @@ const navigationItems: NavigationItem[] = [
     ],
   },
   {
+    title: 'Recruitment',
+    key: 'recruitment',
+    icon: <UserAddOutlined />,
+    children: [
+      { title: 'Job Postings', key: 'recruitment-postings', icon: <UserAddOutlined />, href: '/recruitment/postings' },
+      { title: 'Job Candidates', key: 'recruitment-candidates', icon: <UserAddOutlined />, href: '/recruitment/candidates' },
+    ],
+  },
+  {
     title: 'Attendance',
     key: 'attendance',
     icon: <ClockCircleOutlined />,

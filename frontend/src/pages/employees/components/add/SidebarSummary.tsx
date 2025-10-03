@@ -27,6 +27,7 @@ const SidebarSummary: React.FC = () => {
         <Button size="large" icon={<EyeOutlined />} style={{ background: '#ffffff', borderColor: '#111111', color: '#111111' }}>Preview</Button>
         <Button size="large" icon={<CloseOutlined />} style={{ background: '#ffffff', borderColor: '#111111', color: '#111111' }}>Cancel</Button>
       </div>
+      
     </Card>
   )
 }

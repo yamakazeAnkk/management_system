@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Col, Row } from 'antd';
-import { statistics } from '../Data';
+import { statistics } from '../../Data';
 
 const EmployeesStatsCards: React.FC = () => {
   return (
