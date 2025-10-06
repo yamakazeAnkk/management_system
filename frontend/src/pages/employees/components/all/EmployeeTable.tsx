@@ -109,7 +109,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ selectedRowKeys, onSelect
   if (viewMode === 'grid') {
     return (
       <div style={{ padding: 16 }}>
-        <Row gutter={[16, 16]}>
+        <Row gutter={[24, 24]}>
           {dataRows.map((item) => {
             const initials = (item.name || '')
               .split(' ')
@@ -120,25 +120,22 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ selectedRowKeys, onSelect
               <Col key={item.id} xs={24} sm={12} md={12} lg={8} xl={6}>
                 <Card
                   hoverable
-                  bodyStyle={{ padding: 16 }}
-                  actions={[
-                    <EyeOutlined key="view" onClick={() => navigate(`/employees/${item.id}`)} />,
-                    <EditOutlined key="edit" />,
-                    <DeleteOutlined key="delete" />,
-                  ]}
+                  style={{ height: 220, display: 'flex', flexDirection: 'column' }}
+                  bodyStyle={{ padding: 12, display: 'flex', flexDirection: 'column', height: '100%' }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <Avatar size={48} style={{ background: '#111111', color: '#fff' }}>
                       {item.avatar || initials}
                     </Avatar>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 600 }}>{item.name}</div>
-                      <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</div>
+                      <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {item.email}
                       </div>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 12 }}>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 12, flex: 1 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ color: 'rgba(0,0,0,0.45)' }}>Employee ID</span>
                       <span>{item.id}</span>
@@ -151,11 +148,20 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ selectedRowKeys, onSelect
                       <span style={{ color: 'rgba(0,0,0,0.45)' }}>Position</span>
                       <span>{item.position}</span>
                     </div>
+                    
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ color: 'rgba(0,0,0,0.45)' }}>Status</span>
                       <Tag style={getStatusStyle(item.status)}>{item.status}</Tag>
+                      
                     </div>
+                   
                   </div>
+                  <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'flex-end', gap: 8, borderTop: '1px solid #f0f0f0', paddingTop: 8 }}>
+                    <Button type="text" icon={<EyeOutlined />} onClick={() => navigate(`/employees/${item.id}`)} />
+                    <Button type="text" icon={<EditOutlined />} />
+                    <Button type="text" danger icon={<DeleteOutlined />} />
+                  </div>
+                
                 </Card>
               </Col>
             )
