@@ -23,6 +23,8 @@ import EditDepartmentPage from '../pages/departments/EditDepartmentPage';
 import ProfilePage from '../pages/profile/ProfilePage';
 import SettingsPage from '../pages/profile/SettingsPage';
 import { AllEmployeesPage, AddEmployeesPage, EmployeeProfilePage, DirectoryEmployee } from '../pages/employees';
+import JobCandidatesPage from '../pages/recuritment/JobCandidatesPage';
+import CandidateDetailPage from '../pages/recuritment/CandidateDetailPage';
 
 // Layouts
 import AuthLayout from '../components/layout/AuthLayout';
@@ -103,6 +105,16 @@ const AppRouter: React.FC = () => {
 
         {/* Legacy/typo redirect */}
         <Route path="/employee" element={<Navigate to="/employees" replace />} />
+
+        {/* Recruitment Routes */}
+        <Route path="/recruitment" element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }>
+          <Route path="candidates" element={<JobCandidatesPage />} />
+          <Route path="candidates/:id" element={<CandidateDetailPage />} />
+        </Route>
 
         {/* Profile Routes */}
         <Route path="/profile" element={

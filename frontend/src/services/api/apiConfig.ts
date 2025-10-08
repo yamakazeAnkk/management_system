@@ -32,5 +32,18 @@ export const apiConfig = {
       update: (id: string) => `/departments/${id}`,
       delete: (id: string) => `/departments/${id}`,
     },
+    candidates: {
+      list: '/candidates',
+      create: '/candidates',
+      get: (id: string) => `/candidates/${id}`,
+      update: (id: string) => `/candidates/${id}`,
+      delete: (id: string) => `/candidates/${id}`,
+      bulkDelete: '/candidates/bulk',
+      updateStatus: (id: string) => `/candidates/${id}/status`,
+      addNotes: (id: string) => `/candidates/${id}/notes`,
+      rate: (id: string) => `/candidates/${id}/rating`,
+      export: '/candidates/export',
+      stats: '/candidates/stats',
+    },
   },
 };

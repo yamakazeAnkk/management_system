@@ -3,6 +3,9 @@ export { default as apiClient } from './api/apiClient';
 
 // Auth services
 export * from './auth/authService';
+
+// Candidate services
+export { candidateService } from './candidates/candidateService';
 export * from './auth/tokenService';
 
 // User services

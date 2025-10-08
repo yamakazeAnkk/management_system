@@ -31,6 +31,10 @@ export const ROUTES = {
   PROFILE: '/profile',
   SETTINGS: '/settings',
 
+  // Recruitment routes
+  CANDIDATES: '/recruitment/candidates',
+  CANDIDATE_DETAIL: (id: string) => `/recruitment/candidates/${id}`,
+
   // Root route
   HOME: '/',
 } as const;

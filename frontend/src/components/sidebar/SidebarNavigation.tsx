@@ -11,6 +11,7 @@ import {
   SettingOutlined,
   ClockCircleOutlined,
   TrophyOutlined,
+  ProfileOutlined,
   MessageOutlined,
 } from '@ant-design/icons';
 
@@ -44,8 +45,8 @@ const navigationItems: NavigationItem[] = [
     key: 'recruitment',
     icon: <UserAddOutlined />,
     children: [
-      { title: 'Job Postings', key: 'recruitment-postings', icon: <UserAddOutlined />, href: '/recruitment/postings' },
-      { title: 'Job Candidates', key: 'recruitment-candidates', icon: <UserAddOutlined />, href: '/recruitment/candidates' },
+      { title: 'Job Postings', key: 'recruitment-postings', icon: <TeamOutlined />, href: '/recruitment/postings' },
+      { title: 'Job Candidates', key: 'recruitment-candidates', icon: <ProfileOutlined />, href: '/recruitment/candidates' },
     ],
   },
   {
@@ -123,6 +124,9 @@ export function SidebarNavigation({ isCollapsed }: SidebarNavigationProps) {
     const path = location.pathname;
     if (path.startsWith('/employees')) return 'employees-all';
     if (path.startsWith('/dashboard')) return 'dashboard';
+    if (path.startsWith('/recruitment/candidates')) return 'recruitment-candidates';
+    if (path.startsWith('/recruitment/postings')) return 'recruitment-postings';
+    if (path.startsWith('/recruitment')) return 'recruitment-candidates';
     return undefined;
   }, [location.pathname]);
 

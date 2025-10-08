@@ -28,3 +28,7 @@ export { default as EditDepartmentPage } from './departments/EditDepartmentPage'
 // Profile pages
 export { default as ProfilePage } from './profile/ProfilePage';
 export { default as SettingsPage } from './profile/SettingsPage';
+
+// Recruitment pages
+export { default as JobCandidatesPage } from './recuritment/JobCandidatesPage';
+export { default as CandidateDetailPage } from './recuritment/CandidateDetailPage';
