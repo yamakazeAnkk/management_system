@@ -19,7 +19,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
   statusColors,
   statusLabels,
 }) => {
-  const columns = [
+  const columns = [    
     {
       title: 'Name',
       dataIndex: 'firstName',

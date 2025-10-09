@@ -8,7 +8,6 @@ import {
   RiseOutlined,
   FallOutlined,
 } from '@ant-design/icons';
-import { Layout } from '../../components';
 
 const AnalyticsPage: React.FC = () => {
   // Mock data
@@ -76,7 +75,7 @@ const AnalyticsPage: React.FC = () => {
   ];
 
   return (
-    <Layout>
+    <div>
       <div>
         <h1 style={{ marginBottom: 24 }}>Phân tích & Báo cáo</h1>
         
@@ -150,7 +149,7 @@ const AnalyticsPage: React.FC = () => {
           </Col>
         </Row>
       </div>
-    </Layout>
+    </div>
   );
 };
 

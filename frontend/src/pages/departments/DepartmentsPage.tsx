@@ -22,7 +22,6 @@ import {
   BankOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
-import { Layout } from '../../components';
 import { Department } from '../../types';
 
 const { Search } = Input;
@@ -198,7 +197,7 @@ const DepartmentsPage: React.FC = () => {
   }));
 
   return (
-    <Layout>
+    <div>
       <div>
         <Row gutter={16} style={{ marginBottom: 24 }}>
           <Col span={8}>
@@ -327,7 +326,7 @@ const DepartmentsPage: React.FC = () => {
           </div>
         </Modal>
       </div>
-    </Layout>
+    </div>
   );
 };
 

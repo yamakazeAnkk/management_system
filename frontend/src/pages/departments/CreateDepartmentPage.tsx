@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card, Button, Space } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { Layout } from '../../components';
 import { DepartmentForm } from '../../components';
 
 const CreateDepartmentPage: React.FC = () => {
@@ -10,7 +9,7 @@ const CreateDepartmentPage: React.FC = () => {
   };
 
   return (
-    <Layout>
+    <div>
       <div>
         <Space style={{ marginBottom: 24 }}>
           <Button icon={<ArrowLeftOutlined />}>
@@ -22,7 +21,7 @@ const CreateDepartmentPage: React.FC = () => {
           <DepartmentForm onSubmit={handleSubmit} />
         </Card>
       </div>
-    </Layout>
+    </div>
   );
 };
 

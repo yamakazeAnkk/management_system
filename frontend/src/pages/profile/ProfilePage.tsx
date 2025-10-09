@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card, Descriptions, Button, Space, Avatar } from 'antd';
 import { EditOutlined, UserOutlined } from '@ant-design/icons';
-import { Layout } from '../../components';
 
 const ProfilePage: React.FC = () => {
   const user = {
@@ -18,7 +17,7 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <Layout>
+    <div>
       <div>
         <Card title="Thông tin cá nhân">
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
@@ -47,7 +46,7 @@ const ProfilePage: React.FC = () => {
           </Space>
         </Card>
       </div>
-    </Layout>
+    </div>
   );
 };
 

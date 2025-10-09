@@ -22,7 +22,6 @@ import {
   UserOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
-import { Layout } from '../../components';
 import { User } from '../../types';
 
 const { Search } = Input;
@@ -191,7 +190,7 @@ const UsersPage: React.FC = () => {
   });
 
   return (
-    <Layout>
+    <div>
       <div>
         <Row gutter={16} style={{ marginBottom: 24 }}>
           <Col span={6}>
@@ -322,7 +321,7 @@ const UsersPage: React.FC = () => {
           </div>
         </Modal>
       </div>
-    </Layout>
+    </div>
   );
 };
 

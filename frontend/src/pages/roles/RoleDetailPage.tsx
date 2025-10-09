@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card, Descriptions, Tag, Button, Space } from 'antd';
 import { EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import { Layout } from '../../components';
 
 const RoleDetailPage: React.FC = () => {
   const role = {
@@ -18,7 +17,7 @@ const RoleDetailPage: React.FC = () => {
   };
 
   return (
-    <Layout>
+    <div>
       <div>
         <Space style={{ marginBottom: 24 }}>
           <Button icon={<ArrowLeftOutlined />}>
@@ -48,7 +47,7 @@ const RoleDetailPage: React.FC = () => {
           </Descriptions>
         </Card>
       </div>
-    </Layout>
+    </div>
   );
 };
 

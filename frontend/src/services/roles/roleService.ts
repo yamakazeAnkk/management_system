@@ -1,7 +1,7 @@
 import { message } from 'antd';
 import apiClient from '../api/apiClient';
 import { apiConfig } from '../api/apiConfig';
-import { Role, CreateRoleRequest, UpdateRoleRequest, RoleListResponse } from '../../types';
+import { Role, CreateRoleRequest, UpdateRoleRequest, RoleListResponse, Permission } from '../../types';
 
 class RoleService {
   async getRoles(params?: {
@@ -81,6 +81,39 @@ class RoleService {
       message.success(`Đã xóa ${ids.length} vai trò`);
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Xóa nhiều vai trò thất bại';
+      message.error(errorMessage);
+      throw error;
+    }
+  }
+
+  async getPermissions(): Promise<Permission[]> {
+    try {
+      const response = await apiClient.get<Permission[]>('/permissions');
+      return response;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Lấy danh sách quyền thất bại';
+      message.error(errorMessage);
+      throw error;
+    }
+  }
+
+  async getDepartments(): Promise<{ id: string; name: string }[]> {
+    try {
+      const response = await apiClient.get<{ id: string; name: string }[]>('/departments');
+      return response;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Lấy danh sách phòng ban thất bại';
+      message.error(errorMessage);
+      throw error;
+    }
+  }
+
+  async getRolesForDropdown(): Promise<{ id: string; name: string }[]> {
+    try {
+      const response = await apiClient.get<{ id: string; name: string }[]>('/roles/dropdown');
+      return response;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Lấy danh sách vai trò thất bại';
       message.error(errorMessage);
       throw error;
     }

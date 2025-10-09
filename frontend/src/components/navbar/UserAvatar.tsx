@@ -1,7 +1,8 @@
 import React from 'react';
 import { Avatar, Dropdown, Typography } from 'antd';
-import { UserOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons';
+import { UserOutlined, SettingOutlined, LogoutOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import useAuthSimple from '../../hooks/auth/useAuthSimple';
 
 const { Text } = Typography;
@@ -20,17 +21,26 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
   style
 }) => {
   const { user, logout } = useAuthSimple();
+  const navigate = useNavigate();
 
   const userMenuItems: MenuProps['items'] = [
     {
       key: 'profile',
       icon: <UserOutlined />,
       label: 'Thông tin cá nhân',
+      onClick: () => navigate('/profile'),
     },
     {
       key: 'settings',
       icon: <SettingOutlined />,
       label: 'Cài đặt',
+      onClick: () => navigate('/profile/settings'),
+    },
+    {
+      key: 'roles',
+      icon: <SafetyCertificateOutlined />,
+      label: 'Quản lý vai trò',
+      onClick: () => navigate('/roles'),
     },
     { type: 'divider' },
     {
