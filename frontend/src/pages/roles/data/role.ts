@@ -249,7 +249,7 @@ export const initialRoleData: RoleSeed[] = [
       "performance.view", "performance.manage", "goal.manage",
       "report.view", "report.create", "analytics.view"
     ],
-    isActive: true,
+    isActive: false,
     requireTwoFactor: true,
     allowApiAccess: false,
     sessionTimeout: 240,

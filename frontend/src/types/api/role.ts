@@ -1,17 +1,47 @@
 export interface Role {
   id: string;
   name: string;
-  description?: string;
-  department?: string;
-  roleLevel?: string;
-  reportsTo?: string;
-  permissions: Permission[];
+  code: string; // ROLE_ADMIN, ROLE_HR_MANAGER, etc.
+  description: string;
+  category: 'system' | 'business' | 'department';
+  isSystem: boolean;
   isActive: boolean;
-  requireTwoFactor?: boolean;
-  allowApiAccess?: boolean;
-  sessionTimeout?: number;
+  hierarchy: RoleHierarchy;
+  permissions: RolePermissions;
+  securitySettings: RoleSecuritySettings;
+  usage: RoleUsage;
+  metadata: RoleMetadata;
+}
+
+export interface RoleHierarchy {
+  level: number; // 1=entry, 2=associate, 3=lead, 4=manager, 5=director, 6=c-level
+  reportsTo?: string; // reference to parent role
+  departmentScope: 'all' | 'specific' | 'none';
+}
+
+export interface RolePermissions {
+  permissionIds: string[];
+  inheritedFrom: string[]; // parent roles
+  customPermissions: string[]; // additional permissions
+}
+
+export interface RoleSecuritySettings {
+  requireTwoFactor: boolean;
+  allowApiAccess: boolean;
+  sessionTimeout: number; // minutes
+  maxConcurrentSessions: number;
+}
+
+export interface RoleUsage {
+  userCount: number;
+  lastAssignedAt?: string;
+}
+
+export interface RoleMetadata {
   createdAt: string;
   updatedAt: string;
+  createdBy?: string;
+  updatedBy?: string;
 }
 
 export interface Permission {
@@ -35,27 +65,25 @@ export interface PermissionCategory {
 
 export interface CreateRoleRequest {
   name: string;
-  description?: string;
-  department?: string;
-  roleLevel?: string;
-  reportsTo?: string;
-  permissionIds: string[];
-  requireTwoFactor?: boolean;
-  allowApiAccess?: boolean;
-  sessionTimeout?: number;
+  code: string;
+  description: string;
+  category: 'system' | 'business' | 'department';
+  isSystem: boolean;
+  hierarchy: Omit<RoleHierarchy, 'reportsTo'> & { reportsTo?: string };
+  permissions: Omit<RolePermissions, 'inheritedFrom'>;
+  securitySettings: RoleSecuritySettings;
 }
 
 export interface UpdateRoleRequest {
   name?: string;
+  code?: string;
   description?: string;
-  department?: string;
-  roleLevel?: string;
-  reportsTo?: string;
-  permissionIds?: string[];
+  category?: 'system' | 'business' | 'department';
+  isSystem?: boolean;
   isActive?: boolean;
-  requireTwoFactor?: boolean;
-  allowApiAccess?: boolean;
-  sessionTimeout?: number;
+  hierarchy?: Partial<RoleHierarchy>;
+  permissions?: Partial<RolePermissions>;
+  securitySettings?: Partial<RoleSecuritySettings>;
 }
 
 export interface RoleListResponse {

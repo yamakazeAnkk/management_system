@@ -1,0 +1,213 @@
+package handler
+
+import (
+	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+
+	sif "management_system/internal/service/interfaces"
+)
+
+type UserHandler struct {
+	userService sif.UserService
+}
+
+func NewUserHandler(userService sif.UserService) *UserHandler {
+	return &UserHandler{
+		userService: userService,
+	}
+}
+
+// CreateUser creates a new user with full details
+func (h *UserHandler) CreateUser(c *gin.Context) {
+	var req sif.CreateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user, err := h.userService.CreateUser(c.Request.Context(), req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, user)
+}
+
+// GetUser retrieves a user by ID
+func (h *UserHandler) GetUser(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user ID is required"})
+		return
+	}
+
+	user, err := h.userService.GetUser(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
+
+// UpdateUser updates a user
+func (h *UserHandler) UpdateUser(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user ID is required"})
+		return
+	}
+
+	var req sif.UpdateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user, err := h.userService.UpdateUser(c.Request.Context(), id, req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
+
+// DeleteUser deletes a user
+func (h *UserHandler) DeleteUser(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user ID is required"})
+		return
+	}
+
+	err := h.userService.DeleteUser(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "user deleted successfully"})
+}
+
+// ListUsers lists users with optional filtering
+func (h *UserHandler) ListUsers(c *gin.Context) {
+	// Parse query parameters
+	limitStr := c.DefaultQuery("limit", "10")
+	offsetStr := c.DefaultQuery("offset", "0")
+	departmentID := c.Query("departmentId")
+	isActiveStr := c.Query("isActive")
+	employeeID := c.Query("employeeId")
+	search := c.Query("search")
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil || limit <= 0 {
+		limit = 10
+	}
+
+	offset, err := strconv.Atoi(offsetStr)
+	if err != nil || offset < 0 {
+		offset = 0
+	}
+
+	// Build filter
+	filter := sif.UserFilter{}
+	if departmentID != "" {
+		filter.DepartmentID = &departmentID
+	}
+	if isActiveStr != "" {
+		isActive, err := strconv.ParseBool(isActiveStr)
+		if err == nil {
+			filter.IsActive = &isActive
+		}
+	}
+	if employeeID != "" {
+		filter.EmployeeID = &employeeID
+	}
+	if search != "" {
+		filter.Search = &search
+	}
+
+	users, total, err := h.userService.ListUsers(c.Request.Context(), filter, limit, offset)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"users": users,
+		"total": total,
+		"limit": limit,
+		"offset": offset,
+	})
+}
+
+// AssignRoles assigns roles to a user
+func (h *UserHandler) AssignRoles(c *gin.Context) {
+	userID := c.Param("id")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user ID is required"})
+		return
+	}
+
+	var req struct {
+		RoleIDs []string `json:"roleIds" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := h.userService.AssignRoles(c.Request.Context(), userID, req.RoleIDs)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "roles assigned successfully"})
+}
+
+// RemoveRoles removes roles from a user
+func (h *UserHandler) RemoveRoles(c *gin.Context) {
+	userID := c.Param("id")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user ID is required"})
+		return
+	}
+
+	var req struct {
+		RoleIDs []string `json:"roleIds" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := h.userService.RemoveRoles(c.Request.Context(), userID, req.RoleIDs)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "roles removed successfully"})
+}
+
+// GetUserRoles gets roles assigned to a user
+func (h *UserHandler) GetUserRoles(c *gin.Context) {
+	userID := c.Param("id")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user ID is required"})
+		return
+	}
+
+	roles, err := h.userService.GetUserRoles(c.Request.Context(), userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"roles": roles})
+}

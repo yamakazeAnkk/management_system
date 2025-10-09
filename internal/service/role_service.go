@@ -25,10 +25,10 @@ func (s *roleService) Create(ctx context.Context, in model.Role) (model.Role, er
 		in.ID = model.NewUUID()
 	}
 	now := time.Now()
-	if in.CreatedAt.IsZero() {
-		in.CreatedAt = now
+	if in.Metadata.CreatedAt.IsZero() {
+		in.Metadata.CreatedAt = now
 	}
-	in.UpdatedAt = now
+	in.Metadata.UpdatedAt = now
 	if in.Name == "" {
 		return in, errors.New("name is required")
 	}
@@ -43,7 +43,7 @@ func (s *roleService) GetByID(ctx context.Context, id string) (model.Role, error
 }
 
 func (s *roleService) Update(ctx context.Context, id string, in model.Role) (model.Role, error) {
-	in.UpdatedAt = time.Now()
+	in.Metadata.UpdatedAt = time.Now()
 	if err := s.repo.Update(ctx, id, in); err != nil {
 		return in, err
 	}

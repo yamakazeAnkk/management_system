@@ -4,11 +4,12 @@ import RoleStats from './components/RolesStats';
 import RoleHeader from './components/RoleHeader';
 import RoleFilters, { RoleFilterType } from './components/RoleFilters';
 import RolesTable from './components/RolesTable';
+import { RolesForm } from './components';
 import { initialRoleData, getTotalUsersAssigned, Role } from './data/role';
 
 
 const RolesPage: React.FC = () => {
-  const [roles] = useState<Role[]>(initialRoleData);
+  const [roles, setRoles] = useState<Role[]>(initialRoleData);
   const [loading] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -118,6 +119,8 @@ const RolesPage: React.FC = () => {
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}
         counts={filterCounts}
+        searchText={searchText}
+        onSearchChange={setSearchText}
       />
 
         <RolesTable
@@ -138,10 +141,32 @@ const RolesPage: React.FC = () => {
           footer={null}
           width={800}
         >
-          {/* TODO: Add RoleForm component */}
-          <div style={{ padding: '20px 0' }}>
-            Form sẽ được thêm vào đây
-          </div>
+          <RolesForm
+            initialValues={editingRole ?? undefined}
+            onCancel={handleModalClose}
+            onSubmit={(values) => {
+              if (editingRole) {
+                setRoles((prev) => prev.map((r) => (r.id === editingRole.id ? { ...r, ...values } as Role : r)));
+                message.success('Cập nhật vai trò thành công');
+              } else {
+                const newRole: Role = {
+                  id: `ROLE${String(roles.length + 1).padStart(3, '0')}`,
+                  name: values.name!,
+                  description: values.description,
+                  department: values.department,
+                  roleLevel: 'entry',
+                  isSystem: false,
+                  permissionKeys: [],
+                  isActive: values.isActive ?? true,
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                } as Role;
+                setRoles((prev) => [newRole, ...prev]);
+                message.success('Tạo vai trò thành công');
+              }
+              handleModalClose();
+            }}
+          />
         </Modal>
     </div>
   );

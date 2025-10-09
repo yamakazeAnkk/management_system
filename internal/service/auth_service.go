@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"strings"
 	"time"
 
 	"management_system/internal/model"
@@ -29,18 +30,16 @@ func (s *authService) Login(ctx context.Context, in sif.LoginInput) (sif.TokenPa
 	if err != nil {
 		return sif.TokenPair{}, err
 	}
-	if !u.IsActive {
+	if !u.Status.IsActive {
 		return sif.TokenPair{}, errors.New("user inactive")
 	}
 	if !autil.CheckPassword(u.PasswordHash, in.Password) {
 		return sif.TokenPair{}, errors.New("invalid credentials")
 	}
-	// Build roles/permissions from user's roles
+	// TODO: Build roles/permissions from user's roles via UserRole collection
 	var roleNames []string
 	var perms []string
-	for _, ur := range u.Roles {
-		roleNames = append(roleNames, ur.RoleID.Hex())
-	}
+	// Note: Need to fetch user roles from UserRole collection separately
 	access, err := autil.GenerateAccessToken(u.ID.Hex(), roleNames, perms, 15*time.Minute)
 	if err != nil {
 		return sif.TokenPair{}, err
@@ -52,10 +51,23 @@ func (s *authService) Login(ctx context.Context, in sif.LoginInput) (sif.TokenPa
 	rt := model.RefreshToken{
 		UserID:    u.ID,
 		TokenHash: refreshPlain, // simplified; in real, hash again
+		DeviceInfo: model.DeviceInfo{
+			DeviceID:   "unknown",
+			DeviceName: "unknown",
+			Platform:   "web",
+			UserAgent:  "unknown",
+		},
+		Location: model.TokenLocation{
+			IPAddress: "unknown",
+			Country:   "unknown",
+			City:      "unknown",
+		},
 		ExpiresAt: time.Now().Add(30 * 24 * time.Hour),
 		IsRevoked: false,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		Metadata: model.RefreshTokenMetadata{
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
 	}
 	if err := s.tokens.Create(ctx, rt); err != nil {
 		return sif.TokenPair{}, err
@@ -84,23 +96,93 @@ func (s *authService) Logout(ctx context.Context, refreshToken string) error {
 }
 
 func (s *authService) Register(ctx context.Context, in sif.RegisterInput) error {
+	// This is a simple registration for basic auth
+	// For full user creation with all details, use UserService.CreateUser
+	
 	if in.Username == "" || in.Password == "" || in.FullName == "" {
 		return errors.New("missing required fields")
 	}
+	
 	hash, err := autil.HashPassword(in.Password)
 	if err != nil {
 		return err
 	}
+	
+	// Parse FullName to FirstName and LastName
+	nameParts := strings.Fields(in.FullName)
+	firstName := ""
+	lastName := ""
+	if len(nameParts) > 0 {
+		firstName = nameParts[0]
+		if len(nameParts) > 1 {
+			lastName = strings.Join(nameParts[1:], " ")
+		}
+	}
+	
+	// Create minimal user for basic auth
 	u := model.User{
 		ID:           model.NewUUID(),
+		EmployeeID:   "EMP" + model.NewUUID().Hex()[:6], // Generate Employee ID
 		Username:     in.Username,
 		PasswordHash: hash,
-		FullName:     in.FullName,
-		Email:        in.Email,
-		IsActive:     true,
-		CreatedAt:    time.Now(),
-		UpdatedAt:    time.Now(),
-		Roles:        []model.UserRole{},
+		PersonalInfo: model.PersonalInfo{
+			FirstName: firstName,
+			LastName:  lastName,
+			FullName:  in.FullName,
+			Email:     *in.Email,
+			Address: model.Address{
+				Street:     "",
+				City:       "",
+				State:      "",
+				Country:    "",
+				PostalCode: "",
+			},
+		},
+		EmploymentInfo: model.EmploymentInfo{
+			Position:       "",
+			JobTitle:       "",
+			EmploymentType: "full-time",
+			WorkLocation:   "",
+			JoinDate:       time.Now(),
+			Salary: model.Salary{
+				Amount:        0,
+				Currency:      "USD",
+				Type:          "monthly",
+				IsConfidential: false,
+			},
+			Benefits:      []string{},
+			BonusEligible: false,
+		},
+		ProfessionalInfo: model.ProfessionalInfo{
+			Skills:         []string{},
+			Certifications: []string{},
+			Education:      []model.Education{},
+			Languages:      []string{},
+		},
+		EmergencyContact: model.EmergencyContact{
+			Name:         "",
+			Relationship: "",
+			Phone:        "",
+			Email:        "",
+		},
+		Documents: model.UserDocuments{
+			Contracts:    []model.DocumentInfo{},
+			Certificates: []model.DocumentInfo{},
+			Other:        []model.DocumentInfo{},
+		},
+		Status: model.UserStatus{
+			IsActive: true,
+			Status:   "active",
+		},
+		SecuritySettings: model.SecuritySettings{
+			RequireTwoFactor: false,
+			LoginAttempts:    0,
+		},
+		Metadata: model.UserMetadata{
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
 	}
+	
 	return s.users.Create(ctx, u)
 }

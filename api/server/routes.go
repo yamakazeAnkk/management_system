@@ -92,14 +92,67 @@ func (s *Server) RegisterRoutes() http.Handler {
 			return
 		}
 		u := model.User{
-			ID:           model.NewUUID(),
-			Username:     username,
+			ID:         model.NewUUID(),
+			EmployeeID: "EMP000001",
+			Username:   username,
 			PasswordHash: hash,
-			FullName:     "Administrator",
-			IsActive:     true,
-			CreatedAt:    time.Now(),
-			UpdatedAt:    time.Now(),
-			Roles:        []model.UserRole{},
+			PersonalInfo: model.PersonalInfo{
+				FirstName: "Admin",
+				LastName:  "User",
+				FullName:  "Administrator",
+				Email:     "admin@company.com",
+				Address: model.Address{
+					Street:     "",
+					City:       "",
+					State:      "",
+					Country:    "",
+					PostalCode: "",
+				},
+			},
+			EmploymentInfo: model.EmploymentInfo{
+				Position:       "System Administrator",
+				JobTitle:       "Administrator",
+				EmploymentType: "full-time",
+				WorkLocation:   "Office",
+				JoinDate:       time.Now(),
+				Salary: model.Salary{
+					Amount:        0,
+					Currency:      "USD",
+					Type:          "monthly",
+					IsConfidential: true,
+				},
+				Benefits:      []string{},
+				BonusEligible: false,
+			},
+			ProfessionalInfo: model.ProfessionalInfo{
+				Skills:         []string{},
+				Certifications: []string{},
+				Education:      []model.Education{},
+				Languages:      []string{},
+			},
+			EmergencyContact: model.EmergencyContact{
+				Name:         "",
+				Relationship: "",
+				Phone:        "",
+				Email:        "",
+			},
+			Documents: model.UserDocuments{
+				Contracts:    []model.DocumentInfo{},
+				Certificates: []model.DocumentInfo{},
+				Other:        []model.DocumentInfo{},
+			},
+			Status: model.UserStatus{
+				IsActive: true,
+				Status:   "active",
+			},
+			SecuritySettings: model.SecuritySettings{
+				RequireTwoFactor: true,
+				LoginAttempts:    0,
+			},
+			Metadata: model.UserMetadata{
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+			},
 		}
 		if _, err := col.InsertOne(c.Request.Context(), u); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -114,8 +167,27 @@ func (s *Server) RegisterRoutes() http.Handler {
 	roleSvc := service.NewRoleService(roleRepo)
 	RegisterRoleRoutes(r, roleSvc)
 
+	// User routes
+	userCol := s.db.GetDatabase().Collection("users")
+	userRoleCol := s.db.GetDatabase().Collection("user_roles")
+	userRepo := mongodb.NewUserRepository(userCol)
+	userRoleRepo := mongodb.NewUserRoleRepository(userRoleCol)
+	userSvc := service.NewUserService(userRepo, userRoleRepo, roleRepo)
+	userH := handler.NewUserHandler(userSvc)
+	
+	users := r.Group("/users")
+	{
+		users.POST("", userH.CreateUser)
+		users.GET("", userH.ListUsers)
+		users.GET("/:id", userH.GetUser)
+		users.PUT("/:id", userH.UpdateUser)
+		users.DELETE("/:id", userH.DeleteUser)
+		users.POST("/:id/roles", userH.AssignRoles)
+		users.DELETE("/:id/roles", userH.RemoveRoles)
+		users.GET("/:id/roles", userH.GetUserRoles)
+	}
+
 	// Auth routes
-	userRepo := mongodb.NewUserRepository(s.db.GetDatabase().Collection("users"))
 	rtRepo := mongodb.NewRefreshTokenRepository(s.db.GetDatabase().Collection("refresh_tokens"))
 	authSvc := service.NewAuthService(userRepo, rtRepo)
 	authH := handler.NewAuthHandler(authSvc)

@@ -28,6 +28,15 @@ func (r *userRepository) FindByUsername(ctx context.Context, username string) (*
 	return &u, nil
 }
 
+func (r *userRepository) FindByEmployeeID(ctx context.Context, employeeID string) (*model.User, error) {
+	var u model.User
+	err := r.col.FindOne(ctx, bson.M{"employeeId": employeeID}).Decode(&u)
+	if err != nil {
+		return nil, err
+	}
+	return &u, nil
+}
+
 func (r *userRepository) ListByDepartmentId(ctx context.Context, departmentId string) ([]model.User, error) {
 	filter := bson.M{"departmentId": departmentId}
 	cursor, err := r.col.Find(ctx, filter)

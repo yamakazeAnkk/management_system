@@ -1,29 +1,51 @@
 export interface Department {
   id: string;
   name: string;
-  description?: string;
-  parentId?: string;
-  parent?: Department;
+  code: string; // HR, IT, FINANCE, etc.
+  description: string;
+  parentDepartmentId?: string;
+  parentDepartment?: Department;
   children?: Department[];
   managerId?: string;
   manager?: User;
+  budgetCode: string;
+  location: string;
+  contactInfo: DepartmentContact;
   isActive: boolean;
+  metadata: DepartmentMetadata;
+}
+
+export interface DepartmentContact {
+  email: string;
+  phone: string;
+  address: string;
+}
+
+export interface DepartmentMetadata {
   createdAt: string;
   updatedAt: string;
 }
 
 export interface CreateDepartmentRequest {
   name: string;
-  description?: string;
-  parentId?: string;
+  code: string;
+  description: string;
+  parentDepartmentId?: string;
   managerId?: string;
+  budgetCode: string;
+  location: string;
+  contactInfo: DepartmentContact;
 }
 
 export interface UpdateDepartmentRequest {
   name?: string;
+  code?: string;
   description?: string;
-  parentId?: string;
+  parentDepartmentId?: string;
   managerId?: string;
+  budgetCode?: string;
+  location?: string;
+  contactInfo?: Partial<DepartmentContact>;
   isActive?: boolean;
 }
 

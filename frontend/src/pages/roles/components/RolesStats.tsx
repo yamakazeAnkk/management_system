@@ -33,28 +33,28 @@ const RoleStats: React.FC<RoleStatsProps> = ({ roles, usersAssignedCount }) => {
       title: "Total Roles",
       value: totalRoles,
       icon: <SafetyOutlined style={{ color: '#1890ff' }} />,
-      color: '#1890ff',
+      color: '#000000',
       subtitle: "All system roles"
     },
     {
       title: "Active Roles",
       value: activeRoles,
       icon: <TeamOutlined style={{ color: '#52c41a' }} />,
-      color: '#52c41a',
+      color: '#000000',
       subtitle: "Currently in use"
     },
     {
       title: "Custom Roles",
       value: customRoles,
       icon: <UserSwitchOutlined style={{ color: '#faad14' }} />,
-      color: '#faad14',
+      color: '#000000',
       subtitle: "User created"
     },
     {
       title: "Users Assigned",
       value: usersAssigned,
       icon: <UserOutlined style={{ color: '#722ed1' }} />,
-      color: '#722ed1',
+      color: '#000000',
       subtitle: "Total assigned"
     }
   ];

@@ -9,5 +9,8 @@ type UUID = primitive.ObjectID
 
 func NewUUID() UUID {
 	return primitive.NewObjectID()
+}
 
+func ObjectIDFromHex(hex string) (UUID, error) {
+	return primitive.ObjectIDFromHex(hex)
 }

@@ -36,8 +36,6 @@ interface RolesTableProps {
 const RolesTable: React.FC<RolesTableProps> = ({
   roles,
   loading,
-  searchText,
-  onSearchChange,
   selectedRowKeys,
   onSelectionChange,
   onEdit,

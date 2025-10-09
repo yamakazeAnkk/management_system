@@ -2,6 +2,7 @@
 export * from './api/auth';
 export * from './api/user';
 export * from './api/role';
+export * from './api/user-role';
 export * from './api/department';
 export * from './api/candidate';
 export * from './api/common';
