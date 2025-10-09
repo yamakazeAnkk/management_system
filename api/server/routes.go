@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -166,6 +167,71 @@ func (s *Server) RegisterRoutes() http.Handler {
 	roleRepo := mongodb.NewRoleRepository(roleCol)
 	roleSvc := service.NewRoleService(roleRepo)
 	RegisterRoleRoutes(r, roleSvc)
+
+	// Firebase Storage Service - Try real implementation first, fallback to mock
+	var firebaseStorage service.StorageService
+	realStorage, err := service.NewFirebaseStorageServiceReal()
+	if err != nil {
+		fmt.Printf("Warning: failed to initialize real Firebase Storage, using mock: %v\n", err)
+		// Fallback to mock implementation
+		mockStorage, err := service.NewFirebaseStorageService()
+		if err != nil {
+			fmt.Printf("Error: failed to initialize mock Firebase Storage: %v\n", err)
+		} else {
+			firebaseStorage = mockStorage
+		}
+	} else {
+		fmt.Println("Successfully initialized real Firebase Storage")
+		firebaseStorage = realStorage
+	}
+
+	// File upload routes
+	if firebaseStorage != nil {
+		// Initialize UserDocumentService after UserService is created
+		files := r.Group("/files")
+		{
+			// We'll initialize the handler in the route handlers to avoid circular dependency
+			files.POST("/upload/avatar/:userId", func(c *gin.Context) {
+				userCol := s.db.GetDatabase().Collection("users")
+				userRoleCol := s.db.GetDatabase().Collection("user_roles")
+				userRepo := mongodb.NewUserRepository(userCol)
+				userRoleRepo := mongodb.NewUserRoleRepository(userRoleCol)
+				userSvc := service.NewUserService(userRepo, userRoleRepo, roleRepo)
+				userDocSvc := service.NewUserDocumentService(userSvc, firebaseStorage)
+				fileH := handler.NewFileHandler(firebaseStorage, userDocSvc)
+				fileH.UploadAvatar(c)
+			})
+			files.POST("/upload/document/:userId", func(c *gin.Context) {
+				userCol := s.db.GetDatabase().Collection("users")
+				userRoleCol := s.db.GetDatabase().Collection("user_roles")
+				userRepo := mongodb.NewUserRepository(userCol)
+				userRoleRepo := mongodb.NewUserRoleRepository(userRoleCol)
+				userSvc := service.NewUserService(userRepo, userRoleRepo, roleRepo)
+				userDocSvc := service.NewUserDocumentService(userSvc, firebaseStorage)
+				fileH := handler.NewFileHandler(firebaseStorage, userDocSvc)
+				fileH.UploadDocument(c)
+			})
+			files.DELETE("/delete", func(c *gin.Context) {
+				fileH := handler.NewFileHandler(firebaseStorage, nil)
+				fileH.DeleteFile(c)
+			})
+			files.GET("/info", func(c *gin.Context) {
+				fileH := handler.NewFileHandler(firebaseStorage, nil)
+				fileH.GetFileInfo(c)
+			})
+		}
+
+		// Test routes for Firebase Storage
+		testUploadH := handler.NewTestUploadHandler(firebaseStorage)
+		test := r.Group("/test")
+		{
+			test.POST("/upload", testUploadH.TestUpload)
+			test.POST("/upload/avatar", testUploadH.TestAvatarUpload)
+			test.POST("/upload/document", testUploadH.TestDocumentUpload)
+			test.GET("/file-info", testUploadH.TestGetFileInfo)
+			test.DELETE("/file", testUploadH.TestDeleteFile)
+		}
+	}
 
 	// User routes
 	userCol := s.db.GetDatabase().Collection("users")

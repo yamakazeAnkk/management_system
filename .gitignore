@@ -57,3 +57,8 @@ web/yarn.lock
 # Docker
 docker-data/
 *.local.yml
+
+# Firebase Service Account Keys
+*firebase-adminsdk*.json
+firebase-service-account.json
+firebase-credentials.json
