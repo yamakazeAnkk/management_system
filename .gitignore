@@ -22,6 +22,10 @@ bin/
 coverage.out
 vendor/
 
+# Binary files
+api_binary
+*.binary
+
 # Build artifacts
 /dist/
 /build/
