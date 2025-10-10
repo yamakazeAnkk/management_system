@@ -3,6 +3,7 @@ package mongodb
 import (
 	"context"
 	"errors"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -76,6 +77,27 @@ func (r *MongoBaseRepository[T]) Update(ctx context.Context, id string, data T) 
 	if res.MatchedCount == 0 {
 		return errors.New("no document found to update")
 	}
+	return nil
+}
+
+func (r *MongoBaseRepository[T]) PartialUpdate(ctx context.Context, id string, updates map[string]interface{}) error {
+	if r.col == nil {
+		return errors.New("collection is nil")
+	}
+
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return errors.New("invalid id")
+	}
+
+	// Add updatedAt timestamp
+	updates["metadata.updatedAt"] = time.Now()
+
+	_, err = r.col.UpdateOne(ctx, bson.M{"_id": oid}, bson.M{"$set": updates})
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

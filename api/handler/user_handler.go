@@ -77,6 +77,49 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
+// PartialUpdateUser partially updates a user (PATCH)
+// @Summary      Partial update user
+// @Description  Cập nhật một phần user (chỉ fields được gửi)
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        id    path      string                    true  "User ID"
+// @Param        body  body      map[string]interface{}    true  "Partial user data"
+// @Success      200   {object}  model.User
+// @Failure      400   {object}  map[string]string
+// @Failure      404   {object}  map[string]string
+// @Router       /users/{id} [patch]
+func (h *UserHandler) PartialUpdateUser(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user ID is required"})
+		return
+	}
+
+	// Verify user exists
+	_, err := h.userService.GetUser(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+
+	// Parse partial update data
+	var partialData map[string]interface{}
+	if err := c.ShouldBindJSON(&partialData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Use proper partial update service method
+	user, err := h.userService.PartialUpdateUser(c.Request.Context(), id, partialData)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
+
 // DeleteUser deletes a user
 func (h *UserHandler) DeleteUser(c *gin.Context) {
 	id := c.Param("id")

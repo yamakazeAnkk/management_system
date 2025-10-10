@@ -15,7 +15,8 @@ func (s *Server) RegisterRoleRoutes(r *gin.Engine, svc svciface.RoleService) {
 		roles.GET("", h.List)
 		roles.POST("", h.Create)
 		roles.GET("/:id", h.GetByID)
-		roles.PUT("/:id", h.Update)
+		roles.PUT("/:id", h.Update)      // Full update (replace entire resource)
+		roles.PATCH("/:id", h.PartialUpdate)  // Partial update (update specific fields)
 		roles.DELETE("/:id", h.Delete)
 	}
 }

@@ -152,6 +152,57 @@ func (s *userService) UpdateUser(ctx context.Context, id string, req types.Updat
 	return user, nil
 }
 
+func (s *userService) PartialUpdateUser(ctx context.Context, id string, updates map[string]interface{}) (*model.User, error) {
+	// Build MongoDB update document
+	mongoUpdates := make(map[string]interface{})
+	
+	// Map frontend fields to MongoDB fields
+	for key, value := range updates {
+		switch key {
+		case "username":
+			mongoUpdates["username"] = value
+		case "personalInfo":
+			if personalInfo, ok := value.(map[string]interface{}); ok {
+				for pKey, pValue := range personalInfo {
+					mongoUpdates["personalInfo."+pKey] = pValue
+				}
+			}
+		case "employmentInfo":
+			if employmentInfo, ok := value.(map[string]interface{}); ok {
+				for eKey, eValue := range employmentInfo {
+					mongoUpdates["employmentInfo."+eKey] = eValue
+				}
+			}
+		case "professionalInfo":
+			if professionalInfo, ok := value.(map[string]interface{}); ok {
+				for prKey, prValue := range professionalInfo {
+					mongoUpdates["professionalInfo."+prKey] = prValue
+				}
+			}
+		case "status":
+			if status, ok := value.(map[string]interface{}); ok {
+				for sKey, sValue := range status {
+					mongoUpdates["status."+sKey] = sValue
+				}
+			}
+		default:
+			mongoUpdates[key] = value
+		}
+	}
+	
+	// Perform partial update
+	if err := s.users.PartialUpdate(ctx, id, mongoUpdates); err != nil {
+		return nil, err
+	}
+	
+	// Return updated user
+	user, err := s.users.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 func (s *userService) DeleteUser(ctx context.Context, id string) error {
 	return s.users.Delete(ctx, id)
 }

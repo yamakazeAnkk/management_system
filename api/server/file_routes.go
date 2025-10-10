@@ -4,19 +4,20 @@ import (
 	"fmt"
 
 	"management_system/api/handler"
+	"management_system/internal/model"
+	repoif "management_system/internal/repository/interface"
 	"management_system/internal/repository/mongodb"
 
 	"github.com/gin-gonic/gin"
 
 	// Domain imports
-
 	storage_interfaces "management_system/internal/domains/storage/interfaces"
 	storage_domain "management_system/internal/domains/storage/services"
 	user_domain "management_system/internal/domains/user/services"
 )
 
 // RegisterFileRoutes registers file upload and management endpoints
-func (s *Server) RegisterFileRoutes(r *gin.Engine, roleRepo *mongodb.RoleRepository) {
+func (s *Server) RegisterFileRoutes(r *gin.Engine, roleRepo interface{}) {
 	// Firebase Storage Service - Try real implementation first, fallback to mock
 	var firebaseStorage storage_interfaces.StorageService
 	realStorage, err := storage_domain.NewFirebaseStorageServiceReal()
@@ -60,13 +61,15 @@ func (s *Server) RegisterFileRoutes(r *gin.Engine, roleRepo *mongodb.RoleReposit
 	}
 }
 
-func (s *Server) createFileUploadHandler(endpoint string, firebaseStorage storage_interfaces.StorageService, roleRepo *mongodb.RoleRepository) gin.HandlerFunc {
+func (s *Server) createFileUploadHandler(endpoint string, firebaseStorage storage_interfaces.StorageService, roleRepo interface{}) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userCol := s.db.GetDatabase().Collection("users")
 		userRoleCol := s.db.GetDatabase().Collection("user_roles")
 		userRepo := mongodb.NewUserRepository(userCol)
 		userRoleRepo := mongodb.NewUserRoleRepository(userRoleCol)
-		userSvc := user_domain.NewUserService(userRepo, userRoleRepo, roleRepo)
+		// Cast roleRepo to correct type
+		roleRepoTyped := roleRepo.(repoif.BaseRepository[model.Role])
+		userSvc := user_domain.NewUserService(userRepo, userRoleRepo, roleRepoTyped)
 		userDocSvc := user_domain.NewUserDocumentService(userSvc, firebaseStorage)
 		fileH := handler.NewFileHandler(firebaseStorage, userDocSvc)
 		
