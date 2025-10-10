@@ -28,13 +28,13 @@ type UserDocumentService struct {
 		GetUser(ctx context.Context, id string) (*model.User, error)
 		UpdateUser(ctx context.Context, id string, req interfaces.UpdateUserRequest) (*model.User, error)
 	}
-	storageService  StorageService
+	storageService  interfaces.StorageService
 }
 
 func NewUserDocumentService(userService interface {
 	GetUser(ctx context.Context, id string) (*model.User, error)
 	UpdateUser(ctx context.Context, id string, req interfaces.UpdateUserRequest) (*model.User, error)
-}, storageService StorageService) *UserDocumentService {
+}, storageService interfaces.StorageService) *UserDocumentService {
 	return &UserDocumentService{
 		userService:    userService,
 		storageService: storageService,

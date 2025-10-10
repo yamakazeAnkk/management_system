@@ -1,8 +1,9 @@
-package service
+package interfaces
 
 import (
 	"context"
 	"mime/multipart"
+	
 )
 
 // StorageService defines the interface for file storage operations
@@ -31,3 +32,4 @@ type FileUploadResponse struct {
 	MimeType   string `json:"mimeType"`
 	UploadedAt string `json:"uploadedAt"`
 }
+

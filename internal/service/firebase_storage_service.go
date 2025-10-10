@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"management_system/internal/service/interfaces"
 )
 
 type FirebaseStorageService struct {
@@ -15,7 +17,7 @@ type FirebaseStorageService struct {
 }
 
 // Ensure FirebaseStorageService implements StorageService interface
-var _ StorageService = (*FirebaseStorageService)(nil)
+var _ interfaces.StorageService = (*FirebaseStorageService)(nil)
 
 func NewFirebaseStorageService() (*FirebaseStorageService, error) {
 	// For now, return a mock service
@@ -25,7 +27,7 @@ func NewFirebaseStorageService() (*FirebaseStorageService, error) {
 
 
 // UploadFile uploads a file to Firebase Storage (mock implementation)
-func (s *FirebaseStorageService) UploadFile(ctx context.Context, req FileUploadRequest) (*FileUploadResponse, error) {
+func (s *FirebaseStorageService) UploadFile(ctx context.Context, req interfaces.FileUploadRequest) (*interfaces.FileUploadResponse, error) {
 	// Generate unique filename
 	ext := filepath.Ext(req.Header.Filename)
 	timestamp := time.Now().Unix()
@@ -39,7 +41,7 @@ func (s *FirebaseStorageService) UploadFile(ctx context.Context, req FileUploadR
 	// Mock file URL - in production, this would be the actual Firebase Storage URL
 	fileURL := fmt.Sprintf("https://storage.googleapis.com/bookstore-59884.appspot.com/%s", fileName)
 	
-	return &FileUploadResponse{
+	return &interfaces.FileUploadResponse{
 		FileURL:    fileURL,
 		FileName:   req.Header.Filename,
 		FileSize:   req.Header.Size,
@@ -49,8 +51,8 @@ func (s *FirebaseStorageService) UploadFile(ctx context.Context, req FileUploadR
 }
 
 // UploadAvatar uploads user avatar to Firebase Storage
-func (s *FirebaseStorageService) UploadAvatar(ctx context.Context, file multipart.File, header *multipart.FileHeader, userID string) (*FileUploadResponse, error) {
-	return s.UploadFile(ctx, FileUploadRequest{
+func (s *FirebaseStorageService) UploadAvatar(ctx context.Context, file multipart.File, header *multipart.FileHeader, userID string) (*interfaces.FileUploadResponse, error) {
+	return s.UploadFile(ctx, interfaces.FileUploadRequest{
 		File:        file,
 		Header:      header,
 		Folder:      "avatars",
@@ -60,8 +62,8 @@ func (s *FirebaseStorageService) UploadAvatar(ctx context.Context, file multipar
 }
 
 // UploadDocument uploads user document to Firebase Storage
-func (s *FirebaseStorageService) UploadDocument(ctx context.Context, file multipart.File, header *multipart.FileHeader, userID, documentType string) (*FileUploadResponse, error) {
-	return s.UploadFile(ctx, FileUploadRequest{
+func (s *FirebaseStorageService) UploadDocument(ctx context.Context, file multipart.File, header *multipart.FileHeader, userID, documentType string) (*interfaces.FileUploadResponse, error) {
+	return s.UploadFile(ctx, interfaces.FileUploadRequest{
 		File:        file,
 		Header:      header,
 		Folder:      "documents",
@@ -78,14 +80,14 @@ func (s *FirebaseStorageService) DeleteFile(ctx context.Context, fileURL string)
 }
 
 // GetFileInfo gets file information from Firebase Storage (mock implementation)
-func (s *FirebaseStorageService) GetFileInfo(ctx context.Context, fileURL string) (*FileUploadResponse, error) {
+func (s *FirebaseStorageService) GetFileInfo(ctx context.Context, fileURL string) (*interfaces.FileUploadResponse, error) {
 	// Mock implementation - in production, get actual file info from Firebase Storage
 	
 	// Extract filename from URL
 	parts := strings.Split(fileURL, "/")
 	fileName := parts[len(parts)-1]
 	
-	return &FileUploadResponse{
+	return &interfaces.FileUploadResponse{
 		FileURL:    fileURL,
 		FileName:   fileName,
 		FileSize:   1024000, // Mock size

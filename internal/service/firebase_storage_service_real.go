@@ -11,6 +11,8 @@ import (
 
 	"cloud.google.com/go/storage"
 	"google.golang.org/api/option"
+
+	"management_system/internal/service/interfaces"
 )
 
 type FirebaseStorageServiceReal struct {
@@ -19,7 +21,7 @@ type FirebaseStorageServiceReal struct {
 }
 
 // Ensure FirebaseStorageServiceReal implements StorageService interface
-var _ StorageService = (*FirebaseStorageServiceReal)(nil)
+var _ interfaces.StorageService = (*FirebaseStorageServiceReal)(nil)
 
 func NewFirebaseStorageServiceReal() (*FirebaseStorageServiceReal, error) {
 	ctx := context.Background()
@@ -40,7 +42,7 @@ func NewFirebaseStorageServiceReal() (*FirebaseStorageServiceReal, error) {
 }
 
 // UploadFile uploads a file to Firebase Storage (real implementation)
-func (s *FirebaseStorageServiceReal) UploadFile(ctx context.Context, req FileUploadRequest) (*FileUploadResponse, error) {
+func (s *FirebaseStorageServiceReal) UploadFile(ctx context.Context, req interfaces.FileUploadRequest) (*interfaces.FileUploadResponse, error) {
 	// Generate unique filename
 	ext := filepath.Ext(req.Header.Filename)
 	timestamp := time.Now().Unix()
@@ -81,7 +83,7 @@ func (s *FirebaseStorageServiceReal) UploadFile(ctx context.Context, req FileUpl
 		fmt.Printf("Warning: failed to set public ACL: %v\n", err)
 	}
 	
-	return &FileUploadResponse{
+	return &interfaces.FileUploadResponse{
 		FileURL:    fmt.Sprintf("https://storage.googleapis.com/bookstore-59884.appspot.com/%s", fileName),
 		FileName:   req.Header.Filename,
 		FileSize:   req.Header.Size,
@@ -91,8 +93,8 @@ func (s *FirebaseStorageServiceReal) UploadFile(ctx context.Context, req FileUpl
 }
 
 // UploadAvatar uploads user avatar to Firebase Storage
-func (s *FirebaseStorageServiceReal) UploadAvatar(ctx context.Context, file multipart.File, header *multipart.FileHeader, userID string) (*FileUploadResponse, error) {
-	return s.UploadFile(ctx, FileUploadRequest{
+func (s *FirebaseStorageServiceReal) UploadAvatar(ctx context.Context, file multipart.File, header *multipart.FileHeader, userID string) (*interfaces.FileUploadResponse, error) {
+	return s.UploadFile(ctx, interfaces.FileUploadRequest{
 		File:        file,
 		Header:      header,
 		Folder:      "avatars",
@@ -102,8 +104,8 @@ func (s *FirebaseStorageServiceReal) UploadAvatar(ctx context.Context, file mult
 }
 
 // UploadDocument uploads user document to Firebase Storage
-func (s *FirebaseStorageServiceReal) UploadDocument(ctx context.Context, file multipart.File, header *multipart.FileHeader, userID, documentType string) (*FileUploadResponse, error) {
-	return s.UploadFile(ctx, FileUploadRequest{
+func (s *FirebaseStorageServiceReal) UploadDocument(ctx context.Context, file multipart.File, header *multipart.FileHeader, userID, documentType string) (*interfaces.FileUploadResponse, error) {
+	return s.UploadFile(ctx, interfaces.FileUploadRequest{
 		File:        file,
 		Header:      header,
 		Folder:      "documents",
@@ -128,7 +130,7 @@ func (s *FirebaseStorageServiceReal) DeleteFile(ctx context.Context, fileURL str
 }
 
 // GetFileInfo gets file information from Firebase Storage
-func (s *FirebaseStorageServiceReal) GetFileInfo(ctx context.Context, fileURL string) (*FileUploadResponse, error) {
+func (s *FirebaseStorageServiceReal) GetFileInfo(ctx context.Context, fileURL string) (*interfaces.FileUploadResponse, error) {
 	// Extract object name from URL
 	parts := strings.Split(fileURL, "/")
 	if len(parts) < 4 {
@@ -143,7 +145,7 @@ func (s *FirebaseStorageServiceReal) GetFileInfo(ctx context.Context, fileURL st
 		return nil, fmt.Errorf("error getting object attributes: %v", err)
 	}
 	
-	return &FileUploadResponse{
+	return &interfaces.FileUploadResponse{
 		FileURL:    fileURL,
 		FileName:   attrs.Metadata["original_name"],
 		FileSize:   attrs.Size,
