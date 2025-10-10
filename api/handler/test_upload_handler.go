@@ -5,16 +5,16 @@ import (
 	"path/filepath"
 	"strings"
 
-	"management_system/internal/service"
-
+	storage_interfaces "management_system/internal/domains/storage/interfaces"
+	"management_system/internal/domains/storage/types"
 	"github.com/gin-gonic/gin"
 )
 
 type TestUploadHandler struct {
-	storageService service.StorageService
+	storageService storage_interfaces.StorageService
 }
 
-func NewTestUploadHandler(storageService service.StorageService) *TestUploadHandler {
+func NewTestUploadHandler(storageService storage_interfaces.StorageService) *TestUploadHandler {
 	return &TestUploadHandler{
 		storageService: storageService,
 	}
@@ -45,7 +45,7 @@ func (h *TestUploadHandler) TestUpload(c *gin.Context) {
 
 	// Test upload
 	testUserID := "test_user_123"
-	response, err := h.storageService.UploadFile(c.Request.Context(), service.FileUploadRequest{
+	response, err := h.storageService.UploadFile(c.Request.Context(), types.FileUploadRequest{
 		File:        file,
 		Header:      header,
 		Folder:      "test",

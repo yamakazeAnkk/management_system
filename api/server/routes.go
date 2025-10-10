@@ -16,6 +16,12 @@ import (
 	"management_system/internal/repository/mongodb"
 	"management_system/internal/service"
 	authutil "management_system/internal/util/auth"
+
+	// Domain imports
+	auth_domain "management_system/internal/domains/auth/services"
+	storage_interfaces "management_system/internal/domains/storage/interfaces"
+	storage_domain "management_system/internal/domains/storage/services"
+	user_domain "management_system/internal/domains/user/services"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
@@ -169,12 +175,12 @@ func (s *Server) RegisterRoutes() http.Handler {
 	RegisterRoleRoutes(r, roleSvc)
 
 	// Firebase Storage Service - Try real implementation first, fallback to mock
-	var firebaseStorage service.StorageService
-	realStorage, err := service.NewFirebaseStorageServiceReal()
+	var firebaseStorage storage_interfaces.StorageService
+	realStorage, err := storage_domain.NewFirebaseStorageServiceReal()
 	if err != nil {
 		fmt.Printf("Warning: failed to initialize real Firebase Storage, using mock: %v\n", err)
 		// Fallback to mock implementation
-		mockStorage, err := service.NewFirebaseStorageService()
+		mockStorage, err := storage_domain.NewFirebaseStorageService()
 		if err != nil {
 			fmt.Printf("Error: failed to initialize mock Firebase Storage: %v\n", err)
 		} else {
@@ -197,7 +203,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 				userRepo := mongodb.NewUserRepository(userCol)
 				userRoleRepo := mongodb.NewUserRoleRepository(userRoleCol)
 				userSvc := service.NewUserService(userRepo, userRoleRepo, roleRepo)
-				userDocSvc := service.NewUserDocumentService(userSvc, firebaseStorage)
+				userSvcAdapter := user_domain.NewUserServiceAdapter(userSvc)
+				userDocSvc := user_domain.NewUserDocumentService(userSvcAdapter, firebaseStorage)
 				fileH := handler.NewFileHandler(firebaseStorage, userDocSvc)
 				fileH.UploadAvatar(c)
 			})
@@ -207,7 +214,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 				userRepo := mongodb.NewUserRepository(userCol)
 				userRoleRepo := mongodb.NewUserRoleRepository(userRoleCol)
 				userSvc := service.NewUserService(userRepo, userRoleRepo, roleRepo)
-				userDocSvc := service.NewUserDocumentService(userSvc, firebaseStorage)
+				userSvcAdapter := user_domain.NewUserServiceAdapter(userSvc)
+				userDocSvc := user_domain.NewUserDocumentService(userSvcAdapter, firebaseStorage)
 				fileH := handler.NewFileHandler(firebaseStorage, userDocSvc)
 				fileH.UploadDocument(c)
 			})
@@ -255,7 +263,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	// Auth routes
 	rtRepo := mongodb.NewRefreshTokenRepository(s.db.GetDatabase().Collection("refresh_tokens"))
-	authSvc := service.NewAuthService(userRepo, rtRepo)
+	authSvc := auth_domain.NewAuthService(userRepo, rtRepo)
 	authH := handler.NewAuthHandler(authSvc)
 	auth := r.Group("/auth")
 	{

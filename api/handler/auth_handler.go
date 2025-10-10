@@ -5,14 +5,15 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	sif "management_system/internal/service/interfaces"
+	auth_interfaces "management_system/internal/domains/auth/interfaces"
+	auth_types "management_system/internal/domains/auth/types"
 )
 
 type AuthHandler struct {
-	svc sif.AuthService
+	svc auth_interfaces.AuthService
 }
 
-func NewAuthHandler(svc sif.AuthService) *AuthHandler { return &AuthHandler{svc: svc} }
+func NewAuthHandler(svc auth_interfaces.AuthService) *AuthHandler { return &AuthHandler{svc: svc} }
 
 // @Summary Login
 // @Tags auth
@@ -22,7 +23,7 @@ func NewAuthHandler(svc sif.AuthService) *AuthHandler { return &AuthHandler{svc:
 // @Success 200 {object} interfaces.TokenPair
 // @Router /auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
-	var in sif.LoginInput
+	var in auth_types.LoginRequest
 	if err := c.ShouldBindJSON(&in); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -43,7 +44,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 // @Success 201 {string} string "Created"
 // @Router /auth/register [post]
 func (h *AuthHandler) Register(c *gin.Context) {
-	var in sif.RegisterInput
+	var in auth_types.RegisterRequest
 	if err := c.ShouldBindJSON(&in); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

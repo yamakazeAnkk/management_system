@@ -1,23 +1,23 @@
 package handler
 
 import (
-	"math/rand"
 	"net/http"
 	"path/filepath"
 	"strings"
-	"time"
-
-	"management_system/internal/service"
 
 	"github.com/gin-gonic/gin"
+
+	// Domain imports
+	storage_interfaces "management_system/internal/domains/storage/interfaces"
+	user_domain "management_system/internal/domains/user/services"
 )
 
 type FileHandler struct {
-	storageService service.StorageService
-	userDocService *service.UserDocumentService
+	storageService storage_interfaces.StorageService
+	userDocService *user_domain.UserDocumentService
 }
 
-func NewFileHandler(storageService service.StorageService, userDocService *service.UserDocumentService) *FileHandler {
+func NewFileHandler(storageService storage_interfaces.StorageService, userDocService *user_domain.UserDocumentService) *FileHandler {
 	return &FileHandler{
 		storageService: storageService,
 		userDocService: userDocService,
@@ -177,25 +177,4 @@ func contains(slice []string, item string) bool {
 		}
 	}
 	return false
-}
-
-func generateDocumentID() string {
-	// Generate a unique document ID
-	// In production, you might want to use UUID or another ID generation method
-	return "doc_" + generateRandomString(8)
-}
-
-func generateRandomString(length int) string {
-	rand.Seed(time.Now().UnixNano())
-	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	b := make([]byte, length)
-	for i := range b {
-		b[i] = charset[rand.Intn(len(charset))]
-	}
-	return string(b)
-}
-
-func parseTime(timeStr string) time.Time {
-	t, _ := time.Parse(time.RFC3339, timeStr)
-	return t
 }
