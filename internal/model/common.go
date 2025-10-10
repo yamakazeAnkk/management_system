@@ -1,6 +1,8 @@
 package model
 
 import (
+	"time"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -22,4 +24,17 @@ func NewUUIDFromString(hex string) UUID {
 		return primitive.NewObjectID()
 	}
 	return id
+}
+
+// DocumentInfo represents a document attachment (shared across models)
+type DocumentInfo struct {
+	ID          string    `bson:"id"`
+	FileName    string    `bson:"fileName"`
+	FileSize    int64     `bson:"fileSize"`
+	MimeType    string    `bson:"mimeType"`
+	FileURL     string    `bson:"fileUrl"`
+	UploadedAt  time.Time `bson:"uploadedAt"`
+	UploadedBy  *UUID     `bson:"uploadedBy,omitempty"`
+	Description string    `bson:"description,omitempty"`
+	IsActive    bool      `bson:"isActive"`
 }

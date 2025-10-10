@@ -75,67 +75,15 @@ func (s *Server) debugSeedAdmin(c *gin.Context) {
 		return
 	}
 	u := model.User{
-		ID:         model.NewUUID(),
-		EmployeeID: "EMP000001",
-		Username:   username,
+		ID:           model.NewUUID(),
+		Username:     username,
+		Email:        "admin@company.com",
 		PasswordHash: hash,
-		PersonalInfo: model.PersonalInfo{
-			FirstName: "Admin",
-			LastName:  "User",
-			FullName:  "Administrator",
-			Email:     "admin@company.com",
-			Address: model.Address{
-				Street:     "",
-				City:       "",
-				State:      "",
-				Country:    "",
-				PostalCode: "",
-			},
-		},
-		EmploymentInfo: model.EmploymentInfo{
-			Position:       "System Administrator",
-			JobTitle:       "Administrator",
-			EmploymentType: "full-time",
-			WorkLocation:   "Office",
-			JoinDate:       time.Now(),
-			Salary: model.Salary{
-				Amount:        0,
-				Currency:      "USD",
-				Type:          "monthly",
-				IsConfidential: true,
-			},
-			Benefits:      []string{},
-			BonusEligible: false,
-		},
-		ProfessionalInfo: model.ProfessionalInfo{
-			Skills:         []string{},
-			Certifications: []string{},
-			Education:      []model.Education{},
-			Languages:      []string{},
-		},
-		EmergencyContact: model.EmergencyContact{
-			Name:         "",
-			Relationship: "",
-			Phone:        "",
-			Email:        "",
-		},
-		Documents: model.UserDocuments{
-			Contracts:    []model.DocumentInfo{},
-			Certificates: []model.DocumentInfo{},
-			Other:        []model.DocumentInfo{},
-		},
-		Status: model.UserStatus{
-			IsActive: true,
-			Status:   "active",
-		},
-		SecuritySettings: model.SecuritySettings{
-			RequireTwoFactor: true,
-			LoginAttempts:    0,
-		},
-		Metadata: model.UserMetadata{
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-		},
+		Role:         "admin",
+		Status:       "active",
+		LastLoginAt:  nil,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
 	if _, err := col.InsertOne(c.Request.Context(), u); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

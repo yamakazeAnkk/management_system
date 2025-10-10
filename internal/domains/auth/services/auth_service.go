@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
-	"strings"
 	"time"
 
 	"management_system/internal/domains/auth/interfaces"
@@ -27,11 +26,11 @@ func NewAuthService(users repoif.UserRepository, tokens mongodb.RefreshTokenRepo
 }
 
 func (s *authService) Login(ctx context.Context, req types.LoginRequest) (types.TokenPair, error) {
-	u, err := s.users.FindByUsername(ctx, req.Username)
+	u, err := s.users.GetByUsername(ctx, req.Username)
 	if err != nil {
 		return types.TokenPair{}, err
 	}
-	if !u.Status.IsActive {
+	if u.Status != "active" {
 		return types.TokenPair{}, errors.New("user inactive")
 	}
 	if !autil.CheckPassword(u.PasswordHash, req.Password) {
@@ -109,80 +108,19 @@ func (s *authService) Register(ctx context.Context, req types.RegisterRequest) e
 		return err
 	}
 	
-	// Parse FullName to FirstName and LastName
-	nameParts := strings.Fields(req.FullName)
-	firstName := ""
-	lastName := ""
-	if len(nameParts) > 0 {
-		firstName = nameParts[0]
-		if len(nameParts) > 1 {
-			lastName = strings.Join(nameParts[1:], " ")
-		}
-	}
+	// No need to parse name since User model is simplified
 	
-	// Create minimal user for basic auth
+	// Create minimal user for authentication only
 	u := model.User{
 		ID:           model.NewUUID(),
-		EmployeeID:   "EMP" + model.NewUUID().Hex()[:6], // Generate Employee ID
 		Username:     req.Username,
+		Email:        *req.Email,
 		PasswordHash: hash,
-		PersonalInfo: model.PersonalInfo{
-			FirstName: firstName,
-			LastName:  lastName,
-			FullName:  req.FullName,
-			Email:     *req.Email,
-			Address: model.Address{
-				Street:     "",
-				City:       "",
-				State:      "",
-				Country:    "",
-				PostalCode: "",
-			},
-		},
-		EmploymentInfo: model.EmploymentInfo{
-			Position:       "",
-			JobTitle:       "",
-			EmploymentType: "full-time",
-			WorkLocation:   "",
-			JoinDate:       time.Now(),
-			Salary: model.Salary{
-				Amount:        0,
-				Currency:      "USD",
-				Type:          "monthly",
-				IsConfidential: false,
-			},
-			Benefits:      []string{},
-			BonusEligible: false,
-		},
-		ProfessionalInfo: model.ProfessionalInfo{
-			Skills:         []string{},
-			Certifications: []string{},
-			Education:      []model.Education{},
-			Languages:      []string{},
-		},
-		EmergencyContact: model.EmergencyContact{
-			Name:         "",
-			Relationship: "",
-			Phone:        "",
-			Email:        "",
-		},
-		Documents: model.UserDocuments{
-			Contracts:    []model.DocumentInfo{},
-			Certificates: []model.DocumentInfo{},
-			Other:        []model.DocumentInfo{},
-		},
-		Status: model.UserStatus{
-			IsActive: true,
-			Status:   "active",
-		},
-		SecuritySettings: model.SecuritySettings{
-			RequireTwoFactor: false,
-			LoginAttempts:    0,
-		},
-		Metadata: model.UserMetadata{
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-		},
+		Role:         "user", // Default role
+		Status:       "active",
+		LastLoginAt:  nil,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
 	
 	return s.users.Create(ctx, u)

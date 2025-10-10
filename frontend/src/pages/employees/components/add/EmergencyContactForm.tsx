@@ -6,7 +6,7 @@ const EmergencyContactForm: React.FC = () => {
     <Form layout="vertical">
       <Row gutter={16}>
         <Col xs={24} md={12}>
-          <Form.Item label="Contact Name" name="emergencyName"> 
+          <Form.Item label="Contact Name" name="name"> 
             <Input placeholder="Full name" />
           </Form.Item>
         </Col>
@@ -22,12 +22,12 @@ const EmergencyContactForm: React.FC = () => {
           </Form.Item>
         </Col>
         <Col xs={24} md={12}>
-          <Form.Item label="Phone Number" name="emergencyPhone"> 
+          <Form.Item label="Phone Number" name="phoneEmergency"> 
             <Input type="tel" placeholder="+1 (555) 000-0000" />
           </Form.Item>
         </Col>
         <Col xs={24} md={12}>
-          <Form.Item label="Email Address" name="emergencyEmail"> 
+          <Form.Item label="Email Address" name="emailEmergency"> 
             <Input type="email" placeholder="contact@email.com" />
           </Form.Item>
         </Col>

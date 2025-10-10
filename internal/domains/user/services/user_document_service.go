@@ -6,8 +6,8 @@ import (
 	"mime/multipart"
 	"time"
 
+	employee_interfaces "management_system/internal/domains/employee/interfaces"
 	storage_interfaces "management_system/internal/domains/storage/interfaces"
-	"management_system/internal/domains/user/types"
 	"management_system/internal/model"
 	"management_system/internal/util"
 )
@@ -15,20 +15,14 @@ import (
 var errDocumentNotFound = errors.New("document not found")
 
 type UserDocumentService struct {
-	userService     interface {
-		GetUser(ctx context.Context, id string) (*model.User, error)
-		UpdateUser(ctx context.Context, id string, req types.UpdateUserRequest) (*model.User, error)
-	}
+	employeeService employee_interfaces.EmployeeService
 	storageService  storage_interfaces.StorageService
 }
 
-func NewUserDocumentService(userService interface {
-	GetUser(ctx context.Context, id string) (*model.User, error)
-	UpdateUser(ctx context.Context, id string, req types.UpdateUserRequest) (*model.User, error)
-}, storageService storage_interfaces.StorageService) *UserDocumentService {
+func NewUserDocumentService(employeeService employee_interfaces.EmployeeService, storageService storage_interfaces.StorageService) *UserDocumentService {
 	return &UserDocumentService{
-		userService:    userService,
-		storageService: storageService,
+		employeeService: employeeService,
+		storageService:  storageService,
 	}
 }
 
@@ -51,20 +45,20 @@ func (s *UserDocumentService) UploadUserAvatar(ctx context.Context, userID strin
 		IsActive:    true,
 	}
 
-	// Get current user
-	user, err := s.userService.GetUser(ctx, userID)
+	// Get current employee
+	employee, err := s.employeeService.GetEmployee(ctx, userID)
 	if err != nil {
-		// If user not found, we should clean up the uploaded file
+		// If employee not found, we should clean up the uploaded file
 		s.storageService.DeleteFile(ctx, response.FileURL)
 		return nil, err
 	}
 
-	// Update user's avatar in PersonalInfo
-	user.PersonalInfo.AvatarURL = &documentInfo.FileURL
+	// Update employee's avatar (add to documents.photo)
+	employee.Documents.Photo = append(employee.Documents.Photo, documentInfo)
 
-	// Update user in database
-	_, err = s.userService.UpdateUser(ctx, userID, types.UpdateUserRequest{
-		PersonalInfo: &user.PersonalInfo,
+	// Update employee in database
+	_, err = s.employeeService.UpdateEmployee(ctx, userID, model.EmployeeUpdateRequest{
+		Documents: &employee.Documents,
 	})
 	if err != nil {
 		// If update fails, clean up the uploaded file
@@ -95,33 +89,29 @@ func (s *UserDocumentService) UploadUserDocument(ctx context.Context, userID, do
 		IsActive:    true,
 	}
 
-	// Get current user
-	user, err := s.userService.GetUser(ctx, userID)
+	// Get current employee
+	employee, err := s.employeeService.GetEmployee(ctx, userID)
 	if err != nil {
-		// If user not found, clean up the uploaded file
+		// If employee not found, clean up the uploaded file
 		s.storageService.DeleteFile(ctx, response.FileURL)
 		return nil, err
 	}
 
-	// Update user's documents based on document type
+	// Update employee's documents based on document type
 	switch documentType {
 	case "resume":
-		user.Documents.Resume = &documentInfo
+		employee.Documents.Resume = append(employee.Documents.Resume, documentInfo)
 	case "id-document":
-		user.Documents.IDDocument = &documentInfo
+		employee.Documents.IDDocument = append(employee.Documents.IDDocument, documentInfo)
 	case "photo":
-		user.Documents.Photo = &documentInfo
-	case "contract":
-		user.Documents.Contracts = append(user.Documents.Contracts, documentInfo)
-	case "certificate":
-		user.Documents.Certificates = append(user.Documents.Certificates, documentInfo)
+		employee.Documents.Photo = append(employee.Documents.Photo, documentInfo)
 	default:
-		user.Documents.Other = append(user.Documents.Other, documentInfo)
+		employee.Documents.Other = append(employee.Documents.Other, documentInfo)
 	}
 
-	// Update user in database
-	_, err = s.userService.UpdateUser(ctx, userID, types.UpdateUserRequest{
-		Documents: &user.Documents,
+	// Update employee in database
+	_, err = s.employeeService.UpdateEmployee(ctx, userID, model.EmployeeUpdateRequest{
+		Documents: &employee.Documents,
 	})
 	if err != nil {
 		// If update fails, clean up the uploaded file
@@ -134,8 +124,8 @@ func (s *UserDocumentService) UploadUserDocument(ctx context.Context, userID, do
 
 // DeleteUserDocument deletes a user document
 func (s *UserDocumentService) DeleteUserDocument(ctx context.Context, userID, documentID string) error {
-	// Get current user
-	user, err := s.userService.GetUser(ctx, userID)
+	// Get current employee
+	employee, err := s.employeeService.GetEmployee(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -143,47 +133,49 @@ func (s *UserDocumentService) DeleteUserDocument(ctx context.Context, userID, do
 	var fileURL string
 	var found bool
 
-	// Find and remove document from user's documents
-	if user.Documents.Resume != nil && user.Documents.Resume.ID == documentID {
-		fileURL = user.Documents.Resume.FileURL
-		user.Documents.Resume = nil
-		found = true
-	} else if user.Documents.IDDocument != nil && user.Documents.IDDocument.ID == documentID {
-		fileURL = user.Documents.IDDocument.FileURL
-		user.Documents.IDDocument = nil
-		found = true
-	} else if user.Documents.Photo != nil && user.Documents.Photo.ID == documentID {
-		fileURL = user.Documents.Photo.FileURL
-		user.Documents.Photo = nil
-		found = true
-	} else {
-		// Check in arrays
-		for i, doc := range user.Documents.Contracts {
+	// Find and remove document from employee's documents
+	// Check resume array
+	for i, doc := range employee.Documents.Resume {
+		if doc.ID == documentID {
+			fileURL = doc.FileURL
+			employee.Documents.Resume = append(employee.Documents.Resume[:i], employee.Documents.Resume[i+1:]...)
+			found = true
+			break
+		}
+	}
+	
+	if !found {
+		// Check idDocument array
+		for i, doc := range employee.Documents.IDDocument {
 			if doc.ID == documentID {
 				fileURL = doc.FileURL
-				user.Documents.Contracts = append(user.Documents.Contracts[:i], user.Documents.Contracts[i+1:]...)
+				employee.Documents.IDDocument = append(employee.Documents.IDDocument[:i], employee.Documents.IDDocument[i+1:]...)
 				found = true
 				break
 			}
 		}
-		if !found {
-			for i, doc := range user.Documents.Certificates {
-				if doc.ID == documentID {
-					fileURL = doc.FileURL
-					user.Documents.Certificates = append(user.Documents.Certificates[:i], user.Documents.Certificates[i+1:]...)
-					found = true
-					break
-				}
+	}
+	
+	if !found {
+		// Check photo array
+		for i, doc := range employee.Documents.Photo {
+			if doc.ID == documentID {
+				fileURL = doc.FileURL
+				employee.Documents.Photo = append(employee.Documents.Photo[:i], employee.Documents.Photo[i+1:]...)
+				found = true
+				break
 			}
 		}
-		if !found {
-			for i, doc := range user.Documents.Other {
-				if doc.ID == documentID {
-					fileURL = doc.FileURL
-					user.Documents.Other = append(user.Documents.Other[:i], user.Documents.Other[i+1:]...)
-					found = true
-					break
-				}
+	}
+	
+	if !found {
+		// Check other array
+		for i, doc := range employee.Documents.Other {
+			if doc.ID == documentID {
+				fileURL = doc.FileURL
+				employee.Documents.Other = append(employee.Documents.Other[:i], employee.Documents.Other[i+1:]...)
+				found = true
+				break
 			}
 		}
 	}
@@ -198,18 +190,18 @@ func (s *UserDocumentService) DeleteUserDocument(ctx context.Context, userID, do
 		// The file might already be deleted or not accessible
 	}
 
-	// Update user in database
-	_, err = s.userService.UpdateUser(ctx, userID, types.UpdateUserRequest{
-		Documents: &user.Documents,
+	// Update employee in database
+	_, err = s.employeeService.UpdateEmployee(ctx, userID, model.EmployeeUpdateRequest{
+		Documents: &employee.Documents,
 	})
 	return err
 }
 
-// GetUserDocuments returns all documents for a user
-func (s *UserDocumentService) GetUserDocuments(ctx context.Context, userID string) (*model.UserDocuments, error) {
-	user, err := s.userService.GetUser(ctx, userID)
+// GetUserDocuments returns all documents for an employee
+func (s *UserDocumentService) GetUserDocuments(ctx context.Context, userID string) (*model.EmployeeDocuments, error) {
+	employee, err := s.employeeService.GetEmployee(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	return &user.Documents, nil
+	return &employee.Documents, nil
 }

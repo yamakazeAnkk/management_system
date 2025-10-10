@@ -7,8 +7,7 @@ import (
 
 type UserRepository interface {
 	BaseRepository[model.User]
+	GetByUsername(ctx context.Context, username string) (*model.User, error)
+	GetByEmail(ctx context.Context, email string) (*model.User, error)
 	FindByUsername(ctx context.Context, username string) (*model.User, error)
-	FindByEmployeeID(ctx context.Context, employeeID string) (*model.User, error)
-	ListByDepartmentId(ctx context.Context, departmentId string) ([]model.User, error)
-	ListByRoleId(ctx context.Context, roleId string) ([]model.User, error)
 }

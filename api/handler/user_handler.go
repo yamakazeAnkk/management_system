@@ -142,9 +142,8 @@ func (h *UserHandler) ListUsers(c *gin.Context) {
 	// Parse query parameters
 	limitStr := c.DefaultQuery("limit", "10")
 	offsetStr := c.DefaultQuery("offset", "0")
-	departmentID := c.Query("departmentId")
-	isActiveStr := c.Query("isActive")
-	employeeID := c.Query("employeeId")
+	role := c.Query("role")
+	status := c.Query("status")
 	search := c.Query("search")
 
 	limit, err := strconv.Atoi(limitStr)
@@ -159,17 +158,12 @@ func (h *UserHandler) ListUsers(c *gin.Context) {
 
 	// Build filter
 	filter := user_types.UserFilter{}
-	if departmentID != "" {
-		filter.DepartmentID = &departmentID
+	
+	if role != "" {
+		filter.Role = &role
 	}
-	if isActiveStr != "" {
-		isActive, err := strconv.ParseBool(isActiveStr)
-		if err == nil {
-			filter.IsActive = &isActive
-		}
-	}
-	if employeeID != "" {
-		filter.EmployeeID = &employeeID
+	if status != "" {
+		filter.Status = &status
 	}
 	if search != "" {
 		filter.Search = &search
@@ -189,69 +183,5 @@ func (h *UserHandler) ListUsers(c *gin.Context) {
 	})
 }
 
-// AssignRoles assigns roles to a user
-func (h *UserHandler) AssignRoles(c *gin.Context) {
-	userID := c.Param("id")
-	if userID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "user ID is required"})
-		return
-	}
+// Note: Role management methods removed as User model is now for authentication only
 
-	var req struct {
-		RoleIDs []string `json:"roleIds" binding:"required"`
-	}
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	err := h.userService.AssignRoles(c.Request.Context(), userID, req.RoleIDs)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "roles assigned successfully"})
-}
-
-// RemoveRoles removes roles from a user
-func (h *UserHandler) RemoveRoles(c *gin.Context) {
-	userID := c.Param("id")
-	if userID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "user ID is required"})
-		return
-	}
-
-	var req struct {
-		RoleIDs []string `json:"roleIds" binding:"required"`
-	}
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	err := h.userService.RemoveRoles(c.Request.Context(), userID, req.RoleIDs)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "roles removed successfully"})
-}
-
-// GetUserRoles gets roles assigned to a user
-func (h *UserHandler) GetUserRoles(c *gin.Context) {
-	userID := c.Param("id")
-	if userID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "user ID is required"})
-		return
-	}
-
-	roles, err := h.userService.GetUserRoles(c.Request.Context(), userID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"roles": roles})
-}

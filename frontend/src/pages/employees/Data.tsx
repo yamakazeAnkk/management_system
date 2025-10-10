@@ -13,7 +13,7 @@ export type EmployeeSeed = {
   phone: string;
   department: string;
   position: string;
-  status: "Active" | "Inactive" | "On Leave";
+  status: "Active" | "Inactive" | "On Leave" | "Terminated";
   joinDate: string;
   salary: number;
 };
@@ -129,7 +129,7 @@ export type EmployeeProfile = {
   department: string;
   position: string;
   joinDate: string; // human readable date
-  status: "Active" | "Inactive" | "On Leave";
+  status: "Active" | "Inactive" | "On Leave" | "Terminated";
   location: string;
   dateOfBirth: string;
   address: string;

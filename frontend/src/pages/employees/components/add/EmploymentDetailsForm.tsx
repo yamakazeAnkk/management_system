@@ -66,6 +66,7 @@ const EmploymentDetailsForm: React.FC = () => {
               { value: 'active', label: 'Active' },
               { value: 'inactive', label: 'Inactive' },
               { value: 'on-leave', label: 'On Leave' },
+              { value: 'terminated', label: 'Terminated' },
             ]} />
           </Form.Item>
         </Col>

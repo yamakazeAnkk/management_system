@@ -4,13 +4,12 @@ import (
 	"fmt"
 
 	"management_system/api/handler"
-	"management_system/internal/model"
-	repoif "management_system/internal/repository/interface"
 	"management_system/internal/repository/mongodb"
 
 	"github.com/gin-gonic/gin"
 
 	// Domain imports
+	employee_domain "management_system/internal/domains/employee/services"
 	storage_interfaces "management_system/internal/domains/storage/interfaces"
 	storage_domain "management_system/internal/domains/storage/services"
 	user_domain "management_system/internal/domains/user/services"
@@ -63,14 +62,11 @@ func (s *Server) RegisterFileRoutes(r *gin.Engine, roleRepo interface{}) {
 
 func (s *Server) createFileUploadHandler(endpoint string, firebaseStorage storage_interfaces.StorageService, roleRepo interface{}) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userCol := s.db.GetDatabase().Collection("users")
-		userRoleCol := s.db.GetDatabase().Collection("user_roles")
-		userRepo := mongodb.NewUserRepository(userCol)
-		userRoleRepo := mongodb.NewUserRoleRepository(userRoleCol)
-		// Cast roleRepo to correct type
-		roleRepoTyped := roleRepo.(repoif.BaseRepository[model.Role])
-		userSvc := user_domain.NewUserService(userRepo, userRoleRepo, roleRepoTyped)
-		userDocSvc := user_domain.NewUserDocumentService(userSvc, firebaseStorage)
+		// Create Employee service for document management
+		employeeCol := s.db.GetDatabase().Collection("employees")
+		employeeRepo := mongodb.NewEmployeeRepository(employeeCol)
+		employeeSvc := employee_domain.NewEmployeeService(employeeRepo)
+		userDocSvc := user_domain.NewUserDocumentService(employeeSvc, firebaseStorage)
 		fileH := handler.NewFileHandler(firebaseStorage, userDocSvc)
 		
 		if endpoint == "/upload/avatar" {
