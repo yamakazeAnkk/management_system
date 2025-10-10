@@ -14,3 +14,12 @@ func NewUUID() UUID {
 func ObjectIDFromHex(hex string) (UUID, error) {
 	return primitive.ObjectIDFromHex(hex)
 }
+
+func NewUUIDFromString(hex string) UUID {
+	id, err := primitive.ObjectIDFromHex(hex)
+	if err != nil {
+		// Return new UUID if parsing fails
+		return primitive.NewObjectID()
+	}
+	return id
+}

@@ -6,14 +6,15 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	sif "management_system/internal/service/interfaces"
+	user_interfaces "management_system/internal/domains/user/interfaces"
+	user_types "management_system/internal/domains/user/types"
 )
 
 type UserHandler struct {
-	userService sif.UserService
+	userService user_interfaces.UserService
 }
 
-func NewUserHandler(userService sif.UserService) *UserHandler {
+func NewUserHandler(userService user_interfaces.UserService) *UserHandler {
 	return &UserHandler{
 		userService: userService,
 	}
@@ -21,7 +22,7 @@ func NewUserHandler(userService sif.UserService) *UserHandler {
 
 // CreateUser creates a new user with full details
 func (h *UserHandler) CreateUser(c *gin.Context) {
-	var req sif.CreateUserRequest
+	var req user_types.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -61,7 +62,7 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	var req sif.UpdateUserRequest
+	var req user_types.UpdateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -114,7 +115,7 @@ func (h *UserHandler) ListUsers(c *gin.Context) {
 	}
 
 	// Build filter
-	filter := sif.UserFilter{}
+	filter := user_types.UserFilter{}
 	if departmentID != "" {
 		filter.DepartmentID = &departmentID
 	}

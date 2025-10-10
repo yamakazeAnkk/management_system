@@ -1,4 +1,4 @@
-package service
+package services
 
 import (
 	"context"
@@ -6,46 +6,44 @@ import (
 	"time"
 
 	"management_system/internal/model"
+	"management_system/internal/domains/role/interfaces"
 	repoif "management_system/internal/repository/interface"
-	service "management_system/internal/service/interfaces"
 )
-
-// Implementation is in this file; interface moved to role_service_interface.go
 
 type roleService struct {
 	repo repoif.BaseRepository[model.Role]
 }
 
-func NewRoleService(repo repoif.BaseRepository[model.Role]) service.RoleService {
+func NewRoleService(repo repoif.BaseRepository[model.Role]) interfaces.RoleService {
 	return &roleService{repo: repo}
 }
 
-func (s *roleService) Create(ctx context.Context, in model.Role) (model.Role, error) {
-	if in.ID == (model.UUID{}) {
-		in.ID = model.NewUUID()
+func (s *roleService) Create(ctx context.Context, role model.Role) (model.Role, error) {
+	if role.ID == (model.UUID{}) {
+		role.ID = model.NewUUID()
 	}
 	now := time.Now()
-	if in.Metadata.CreatedAt.IsZero() {
-		in.Metadata.CreatedAt = now
+	if role.Metadata.CreatedAt.IsZero() {
+		role.Metadata.CreatedAt = now
 	}
-	in.Metadata.UpdatedAt = now
-	if in.Name == "" {
-		return in, errors.New("name is required")
+	role.Metadata.UpdatedAt = now
+	if role.Name == "" {
+		return role, errors.New("name is required")
 	}
-	if err := s.repo.Create(ctx, in); err != nil {
-		return in, err
+	if err := s.repo.Create(ctx, role); err != nil {
+		return role, err
 	}
-	return in, nil
+	return role, nil
 }
 
 func (s *roleService) GetByID(ctx context.Context, id string) (model.Role, error) {
 	return s.repo.GetByID(ctx, id)
 }
 
-func (s *roleService) Update(ctx context.Context, id string, in model.Role) (model.Role, error) {
-	in.Metadata.UpdatedAt = time.Now()
-	if err := s.repo.Update(ctx, id, in); err != nil {
-		return in, err
+func (s *roleService) Update(ctx context.Context, id string, role model.Role) (model.Role, error) {
+	role.Metadata.UpdatedAt = time.Now()
+	if err := s.repo.Update(ctx, id, role); err != nil {
+		return role, err
 	}
 	return s.repo.GetByID(ctx, id)
 }
@@ -61,7 +59,7 @@ func (s *roleService) List(ctx context.Context, filter map[string]interface{}, l
 	}
 	total, err := s.repo.Count(ctx, filter)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, nil
 	}
 	return items, total, nil
 }

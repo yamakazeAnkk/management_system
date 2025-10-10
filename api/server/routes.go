@@ -14,11 +14,11 @@ import (
 	"management_system/api/middleware"
 	"management_system/internal/model"
 	"management_system/internal/repository/mongodb"
-	"management_system/internal/service"
 	authutil "management_system/internal/util/auth"
 
 	// Domain imports
 	auth_domain "management_system/internal/domains/auth/services"
+	role_domain "management_system/internal/domains/role/services"
 	storage_interfaces "management_system/internal/domains/storage/interfaces"
 	storage_domain "management_system/internal/domains/storage/services"
 	user_domain "management_system/internal/domains/user/services"
@@ -171,7 +171,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	// Role routes
 	roleCol := s.db.GetDatabase().Collection("roles")
 	roleRepo := mongodb.NewRoleRepository(roleCol)
-	roleSvc := service.NewRoleService(roleRepo)
+	roleSvc := role_domain.NewRoleService(roleRepo)
 	RegisterRoleRoutes(r, roleSvc)
 
 	// Firebase Storage Service - Try real implementation first, fallback to mock
@@ -202,9 +202,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 				userRoleCol := s.db.GetDatabase().Collection("user_roles")
 				userRepo := mongodb.NewUserRepository(userCol)
 				userRoleRepo := mongodb.NewUserRoleRepository(userRoleCol)
-				userSvc := service.NewUserService(userRepo, userRoleRepo, roleRepo)
-				userSvcAdapter := user_domain.NewUserServiceAdapter(userSvc)
-				userDocSvc := user_domain.NewUserDocumentService(userSvcAdapter, firebaseStorage)
+				userSvc := user_domain.NewUserService(userRepo, userRoleRepo, roleRepo)
+				userDocSvc := user_domain.NewUserDocumentService(userSvc, firebaseStorage)
 				fileH := handler.NewFileHandler(firebaseStorage, userDocSvc)
 				fileH.UploadAvatar(c)
 			})
@@ -213,9 +212,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 				userRoleCol := s.db.GetDatabase().Collection("user_roles")
 				userRepo := mongodb.NewUserRepository(userCol)
 				userRoleRepo := mongodb.NewUserRoleRepository(userRoleCol)
-				userSvc := service.NewUserService(userRepo, userRoleRepo, roleRepo)
-				userSvcAdapter := user_domain.NewUserServiceAdapter(userSvc)
-				userDocSvc := user_domain.NewUserDocumentService(userSvcAdapter, firebaseStorage)
+				userSvc := user_domain.NewUserService(userRepo, userRoleRepo, roleRepo)
+				userDocSvc := user_domain.NewUserDocumentService(userSvc, firebaseStorage)
 				fileH := handler.NewFileHandler(firebaseStorage, userDocSvc)
 				fileH.UploadDocument(c)
 			})
@@ -246,7 +244,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	userRoleCol := s.db.GetDatabase().Collection("user_roles")
 	userRepo := mongodb.NewUserRepository(userCol)
 	userRoleRepo := mongodb.NewUserRoleRepository(userRoleCol)
-	userSvc := service.NewUserService(userRepo, userRoleRepo, roleRepo)
+	userSvc := user_domain.NewUserService(userRepo, userRoleRepo, roleRepo)
 	userH := handler.NewUserHandler(userSvc)
 	
 	users := r.Group("/users")

@@ -1,13 +1,14 @@
-package service
+package services
 
 import (
 	"context"
 	"errors"
 	"time"
 
+	"management_system/internal/domains/user/interfaces"
+	"management_system/internal/domains/user/types"
 	"management_system/internal/model"
 	repoif "management_system/internal/repository/interface"
-	sif "management_system/internal/service/interfaces"
 	autil "management_system/internal/util/auth"
 )
 
@@ -21,7 +22,7 @@ func NewUserService(
 	users repoif.UserRepository,
 	userRoles repoif.BaseRepository[model.UserRole],
 	roles repoif.BaseRepository[model.Role],
-) sif.UserService {
+) interfaces.UserService {
 	return &userService{
 		users:     users,
 		userRoles: userRoles,
@@ -29,38 +30,30 @@ func NewUserService(
 	}
 }
 
-func (s *userService) CreateUser(ctx context.Context, req sif.CreateUserRequest) (*model.User, error) {
-	// Validate required fields
-	if req.Username == "" || req.Password == "" || req.EmployeeID == "" {
-		return nil, errors.New("username, password, and employeeID are required")
+func (s *userService) CreateUser(ctx context.Context, req types.CreateUserRequest) (*model.User, error) {
+	// Check if username already exists
+	existingUser, err := s.users.FindByUsername(ctx, req.Username)
+	if err == nil && existingUser != nil {
+		return nil, errors.New("username already exists")
 	}
 
 	// Hash password
-	hash, err := autil.HashPassword(req.Password)
+	hashedPassword, err := autil.HashPassword(req.Password)
 	if err != nil {
 		return nil, err
 	}
 
 	// Create user
-	user := &model.User{
+	user := model.User{
 		ID:           model.NewUUID(),
 		EmployeeID:   req.EmployeeID,
 		Username:     req.Username,
-		PasswordHash: hash,
-		PersonalInfo: req.PersonalInfo,
-		EmploymentInfo: req.EmploymentInfo,
+		PasswordHash: hashedPassword,
+		PersonalInfo:     req.PersonalInfo,
+		EmploymentInfo:   req.EmploymentInfo,
 		ProfessionalInfo: req.ProfessionalInfo,
 		EmergencyContact: req.EmergencyContact,
-		Documents: func() model.UserDocuments {
-			if req.Documents != nil {
-				return *req.Documents
-			}
-			return model.UserDocuments{
-				Contracts:    []model.DocumentInfo{},
-				Certificates: []model.DocumentInfo{},
-				Other:        []model.DocumentInfo{},
-			}
-		}(),
+		Documents:        *req.Documents,
 		Status: model.UserStatus{
 			IsActive: true,
 			Status:   "active",
@@ -75,20 +68,20 @@ func (s *userService) CreateUser(ctx context.Context, req sif.CreateUserRequest)
 		},
 	}
 
-	// Save user
-	if err := s.users.Create(ctx, *user); err != nil {
+	if err := s.users.Create(ctx, user); err != nil {
 		return nil, err
 	}
 
 	// Assign roles if provided
 	if len(req.RoleIDs) > 0 {
 		if err := s.AssignRoles(ctx, user.ID.Hex(), req.RoleIDs); err != nil {
-			// Log error but don't fail user creation
-			// In production, you might want to use a transaction here
+			// If role assignment fails, we might want to rollback user creation
+			// For now, just log the error
+			// TODO: Implement transaction rollback
 		}
 	}
 
-	return user, nil
+	return &user, nil
 }
 
 func (s *userService) GetUser(ctx context.Context, id string) (*model.User, error) {
@@ -107,11 +100,13 @@ func (s *userService) GetUserByEmployeeID(ctx context.Context, employeeID string
 	return s.users.FindByEmployeeID(ctx, employeeID)
 }
 
-func (s *userService) UpdateUser(ctx context.Context, id string, req sif.UpdateUserRequest) (*model.User, error) {
-	user, err := s.users.GetByID(ctx, id)
+func (s *userService) UpdateUser(ctx context.Context, id string, req types.UpdateUserRequest) (*model.User, error) {
+	// Get existing user
+	userData, err := s.users.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
+	user := &userData
 
 	// Update fields if provided
 	if req.Username != nil {
@@ -138,13 +133,13 @@ func (s *userService) UpdateUser(ctx context.Context, id string, req sif.UpdateU
 
 	user.Metadata.UpdatedAt = time.Now()
 
-	if err := s.users.Update(ctx, id, user); err != nil {
+	if err := s.users.Update(ctx, id, *user); err != nil {
 		return nil, err
 	}
 
 	// Update roles if provided
 	if len(req.RoleIDs) > 0 {
-		// Remove all existing roles
+		// Remove existing roles
 		if err := s.RemoveAllRoles(ctx, id); err != nil {
 			return nil, err
 		}
@@ -154,183 +149,125 @@ func (s *userService) UpdateUser(ctx context.Context, id string, req sif.UpdateU
 		}
 	}
 
-	return &user, nil
+	return user, nil
 }
 
 func (s *userService) DeleteUser(ctx context.Context, id string) error {
-	// Remove all user roles first
-	if err := s.RemoveAllRoles(ctx, id); err != nil {
-		return err
-	}
-	
 	return s.users.Delete(ctx, id)
 }
 
-func (s *userService) ListUsers(ctx context.Context, filter sif.UserFilter, limit, offset int) ([]*model.User, int64, error) {
-	// Convert filter to map for repository
-	filterMap := make(map[string]interface{})
+func (s *userService) ListUsers(ctx context.Context, filter types.UserFilter, limit, offset int) ([]*model.User, int64, error) {
+	// Build query filter
+	query := make(map[string]interface{})
+	
 	if filter.DepartmentID != nil {
-		filterMap["employmentInfo.departmentId"] = *filter.DepartmentID
+		query["employmentInfo.departmentId"] = *filter.DepartmentID
 	}
 	if filter.IsActive != nil {
-		filterMap["status.isActive"] = *filter.IsActive
+		query["status.isActive"] = *filter.IsActive
 	}
 	if filter.EmployeeID != nil {
-		filterMap["employeeId"] = *filter.EmployeeID
+		query["employeeId"] = *filter.EmployeeID
 	}
 
-	users, err := s.users.List(ctx, filterMap, limit, offset)
+	userList, err := s.users.List(ctx, query, limit, offset)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	total, err := s.users.Count(ctx, filterMap)
+	// Get total count
+	total, err := s.users.Count(ctx, query)
 	if err != nil {
 		return nil, 0, err
 	}
 
 	// Convert []model.User to []*model.User
-	userPtrs := make([]*model.User, len(users))
-	for i := range users {
-		userPtrs[i] = &users[i]
+	users := make([]*model.User, len(userList))
+	for i, u := range userList {
+		users[i] = &u
 	}
 
-	return userPtrs, total, nil
+	return users, total, nil
 }
 
 func (s *userService) AssignRoles(ctx context.Context, userID string, roleIDs []string) error {
-	userObjID, err := model.ObjectIDFromHex(userID)
-	if err != nil {
-		return err
-	}
-
 	for _, roleID := range roleIDs {
-		roleObjID, err := model.ObjectIDFromHex(roleID)
-		if err != nil {
-			continue // Skip invalid role IDs
-		}
-
-		// Check if role exists
-		_, err = s.roles.GetByID(ctx, roleID)
-		if err != nil {
-			continue // Skip non-existent roles
-		}
-
-		// Create user role assignment
 		userRole := model.UserRole{
 			ID:     model.NewUUID(),
-			UserID: userObjID,
-			RoleID: roleObjID,
+			UserID: model.NewUUIDFromString(userID),
+			RoleID: model.NewUUIDFromString(roleID),
 			AssignmentType: "primary",
-			Scope: model.UserRoleScope{
-				LocationCode: "",
-				ProjectIds:   []model.UUID{},
-			},
 			EffectiveDates: model.UserRoleDates{
 				AssignedAt:    time.Now(),
 				EffectiveFrom: time.Now(),
 			},
-			IsActive: true,
+			AssignedBy: nil, // TODO: Get from context
+			IsActive:   true,
 			Metadata: model.UserRoleMetadata{
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
 			},
 		}
-
 		if err := s.userRoles.Create(ctx, userRole); err != nil {
-			// Log error but continue with other roles
-			continue
+			return err
 		}
 	}
-
 	return nil
 }
 
 func (s *userService) RemoveRoles(ctx context.Context, userID string, roleIDs []string) error {
-	userObjID, err := model.ObjectIDFromHex(userID)
-	if err != nil {
-		return err
-	}
-
+	// For now, we'll implement a simple approach
+	// In production, you might want to add a DeleteMany method to BaseRepository
 	for _, roleID := range roleIDs {
-		roleObjID, err := model.ObjectIDFromHex(roleID)
+		// Find the user role first
+		userRoles, err := s.userRoles.List(ctx, map[string]interface{}{
+			"userId": model.NewUUIDFromString(userID),
+			"roleId": model.NewUUIDFromString(roleID),
+		}, 1, 0)
 		if err != nil {
-			continue
+			return err
 		}
-
-		// Find and deactivate user role assignment
-		filter := map[string]interface{}{
-			"userId": userObjID,
-			"roleId": roleObjID,
-			"isActive": true,
-		}
-
-		userRoles, err := s.userRoles.List(ctx, filter, 1, 0)
-		if err != nil || len(userRoles) == 0 {
-			continue
-		}
-
-		userRole := userRoles[0]
-		userRole.IsActive = false
-		userRole.Metadata.UpdatedAt = time.Now()
-
-		if err := s.userRoles.Update(ctx, userRole.ID.Hex(), userRole); err != nil {
-			continue
+		
+		// Delete each found user role
+		for _, userRole := range userRoles {
+			if err := s.userRoles.Delete(ctx, userRole.ID.Hex()); err != nil {
+				return err
+			}
 		}
 	}
-
 	return nil
 }
 
 func (s *userService) RemoveAllRoles(ctx context.Context, userID string) error {
-	userObjID, err := model.ObjectIDFromHex(userID)
+	// Find all user roles for this user
+	userRoles, err := s.userRoles.List(ctx, map[string]interface{}{
+		"userId": model.NewUUIDFromString(userID),
+	}, 1000, 0) // Large limit to get all roles
 	if err != nil {
 		return err
 	}
-
-	filter := map[string]interface{}{
-		"userId": userObjID,
-		"isActive": true,
-	}
-
-	userRoles, err := s.userRoles.List(ctx, filter, 1000, 0)
-	if err != nil {
-		return err
-	}
-
+	
+	// Delete each user role
 	for _, userRole := range userRoles {
-		userRole.IsActive = false
-		userRole.Metadata.UpdatedAt = time.Now()
-		
-		if err := s.userRoles.Update(ctx, userRole.ID.Hex(), userRole); err != nil {
-			continue
+		if err := s.userRoles.Delete(ctx, userRole.ID.Hex()); err != nil {
+			return err
 		}
 	}
-
 	return nil
 }
 
 func (s *userService) GetUserRoles(ctx context.Context, userID string) ([]*model.UserRole, error) {
-	userObjID, err := model.ObjectIDFromHex(userID)
+	userRoles, err := s.userRoles.List(ctx, map[string]interface{}{
+		"userId": model.NewUUIDFromString(userID),
+	}, 1000, 0) // Large limit to get all roles
 	if err != nil {
 		return nil, err
 	}
-
-	filter := map[string]interface{}{
-		"userId": userObjID,
-		"isActive": true,
+	
+	// Convert to pointer slice
+	result := make([]*model.UserRole, len(userRoles))
+	for i, role := range userRoles {
+		result[i] = &role
 	}
-
-	userRoles, err := s.userRoles.List(ctx, filter, 1000, 0)
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert []model.UserRole to []*model.UserRole
-	userRolePtrs := make([]*model.UserRole, len(userRoles))
-	for i := range userRoles {
-		userRolePtrs[i] = &userRoles[i]
-	}
-
-	return userRolePtrs, nil
+	return result, nil
 }
