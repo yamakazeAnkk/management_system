@@ -8,7 +8,7 @@ import (
 )
 
 // RegisterRoleRoutes registers Role endpoints on the provided router using the given service
-func RegisterRoleRoutes(r *gin.Engine, svc svciface.RoleService) {
+func (s *Server) RegisterRoleRoutes(r *gin.Engine, svc svciface.RoleService) {
 	h := handler.NewRoleHandler(svc)
 	roles := r.Group("/roles")
 	{
