@@ -68,7 +68,7 @@ func (s *Server) createFileUploadHandler(endpoint string, firebaseStorage storag
 		employeeSvc := employee_domain.NewEmployeeService(employeeRepo)
 		userDocSvc := user_domain.NewUserDocumentService(employeeSvc, firebaseStorage)
 		fileH := handler.NewFileHandler(firebaseStorage, userDocSvc)
-		
+
 		if endpoint == "/upload/avatar" {
 			fileH.UploadAvatar(c)
 		} else {

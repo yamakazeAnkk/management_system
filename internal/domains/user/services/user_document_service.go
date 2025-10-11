@@ -7,6 +7,7 @@ import (
 	"time"
 
 	employee_interfaces "management_system/internal/domains/employee/interfaces"
+	employee_types "management_system/internal/domains/employee/types"
 	storage_interfaces "management_system/internal/domains/storage/interfaces"
 	"management_system/internal/model"
 	"management_system/internal/util"
@@ -36,13 +37,13 @@ func (s *UserDocumentService) UploadUserAvatar(ctx context.Context, userID strin
 
 	// Create DocumentInfo
 	documentInfo := model.DocumentInfo{
-		ID:          util.GenerateID(),
-		FileName:    response.FileName,
-		FileSize:    response.FileSize,
-		MimeType:    response.MimeType,
-		FileURL:     response.FileURL,
-		UploadedAt:  time.Now(),
-		IsActive:    true,
+		ID:         util.GenerateID(),
+		FileName:   response.FileName,
+		FileSize:   response.FileSize,
+		MimeType:   response.MimeType,
+		FileURL:    response.FileURL,
+		UploadedAt: time.Now(),
+		IsActive:   true,
 	}
 
 	// Get current employee
@@ -57,7 +58,7 @@ func (s *UserDocumentService) UploadUserAvatar(ctx context.Context, userID strin
 	employee.Documents.Photo = append(employee.Documents.Photo, documentInfo)
 
 	// Update employee in database
-	_, err = s.employeeService.UpdateEmployee(ctx, userID, model.EmployeeUpdateRequest{
+	_, err = s.employeeService.UpdateEmployee(ctx, userID, employee_types.UpdateEmployeeRequest{
 		Documents: &employee.Documents,
 	})
 	if err != nil {
@@ -110,7 +111,7 @@ func (s *UserDocumentService) UploadUserDocument(ctx context.Context, userID, do
 	}
 
 	// Update employee in database
-	_, err = s.employeeService.UpdateEmployee(ctx, userID, model.EmployeeUpdateRequest{
+	_, err = s.employeeService.UpdateEmployee(ctx, userID, employee_types.UpdateEmployeeRequest{
 		Documents: &employee.Documents,
 	})
 	if err != nil {
@@ -143,7 +144,7 @@ func (s *UserDocumentService) DeleteUserDocument(ctx context.Context, userID, do
 			break
 		}
 	}
-	
+
 	if !found {
 		// Check idDocument array
 		for i, doc := range employee.Documents.IDDocument {
@@ -155,7 +156,7 @@ func (s *UserDocumentService) DeleteUserDocument(ctx context.Context, userID, do
 			}
 		}
 	}
-	
+
 	if !found {
 		// Check photo array
 		for i, doc := range employee.Documents.Photo {
@@ -167,7 +168,7 @@ func (s *UserDocumentService) DeleteUserDocument(ctx context.Context, userID, do
 			}
 		}
 	}
-	
+
 	if !found {
 		// Check other array
 		for i, doc := range employee.Documents.Other {
@@ -191,7 +192,7 @@ func (s *UserDocumentService) DeleteUserDocument(ctx context.Context, userID, do
 	}
 
 	// Update employee in database
-	_, err = s.employeeService.UpdateEmployee(ctx, userID, model.EmployeeUpdateRequest{
+	_, err = s.employeeService.UpdateEmployee(ctx, userID, employee_types.UpdateEmployeeRequest{
 		Documents: &employee.Documents,
 	})
 	return err

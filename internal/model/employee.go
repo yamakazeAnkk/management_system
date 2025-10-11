@@ -6,80 +6,79 @@ import (
 
 // Employee represents an employee in the organization
 type Employee struct {
-	ID              UUID                `bson:"_id"`
-	UserID          *UUID               `bson:"userId,omitempty"` // Link to User table for authentication
-	EmployeeID      string              `bson:"employeeId"`       // EMP001, EMP002, etc. (unique business identifier)
-	PersonalInfo    EmployeePersonalInfo `bson:"personalInfo"`
-	EmploymentInfo  EmployeeEmploymentInfo `bson:"employmentInfo"`
-	Compensation    EmployeeCompensation `bson:"compensation"`
+	ID               UUID                     `bson:"_id"`
+	UserID           *UUID                    `bson:"userId,omitempty"` // Link to User table for authentication
+	EmployeeID       string                   `bson:"employeeId"`       // EMP001, EMP002, etc. (unique business identifier)
+	PersonalInfo     EmployeePersonalInfo     `bson:"personalInfo"`
+	EmploymentInfo   EmployeeEmploymentInfo   `bson:"employmentInfo"`
+	Compensation     EmployeeCompensation     `bson:"compensation"`
 	EmergencyContact EmployeeEmergencyContact `bson:"emergencyContact"`
 	ProfessionalInfo EmployeeProfessionalInfo `bson:"professionalInfo"`
-	Documents       EmployeeDocuments   `bson:"documents"`
-	Status          EmployeeStatus      `bson:"status"`
-	Metadata        EmployeeMetadata    `bson:"metadata"`
+	Documents        EmployeeDocuments        `bson:"documents"`
+	Status           EmployeeStatus           `bson:"status"`
+	Metadata         EmployeeMetadata         `bson:"metadata"`
 }
 
 // EmployeePersonalInfo contains personal details of the employee
 type EmployeePersonalInfo struct {
-	FirstName    string     `bson:"firstName"`
-	LastName     string     `bson:"lastName"`
-	Email        string     `bson:"email"` // Should match User.email if UserID is set
-	Phone        *string    `bson:"phone,omitempty"`
-	DateOfBirth  *time.Time `bson:"dateOfBirth,omitempty"`
-	Gender       *string    `bson:"gender,omitempty"` // male, female, other, prefer-not
-	Address      *string    `bson:"address,omitempty"` // Full address as text
+	FirstName   string     `bson:"firstName"`
+	LastName    string     `bson:"lastName"`
+	Email       string     `bson:"email"` // Should match User.email if UserID is set
+	Phone       *string    `bson:"phone,omitempty"`
+	DateOfBirth *time.Time `bson:"dateOfBirth,omitempty"`
+	Gender      *string    `bson:"gender,omitempty"`  // male, female, other, prefer-not
+	Address     *string    `bson:"address,omitempty"` // Full address as text
 }
 
 // EmployeeEmploymentInfo contains employment-related information
 type EmployeeEmploymentInfo struct {
-	JobTitle        string     `bson:"jobTitle"`
-	Department      string     `bson:"department"` // engineering, marketing, sales, hr, finance
-	ManagerID       *UUID      `bson:"managerId,omitempty"` // Reference to another Employee
-	StartDate       time.Time  `bson:"startDate"`
-	EmploymentType  string     `bson:"employmentType"` // full-time, part-time, contract, intern
-	Location        *string    `bson:"location,omitempty"` // hq, remote, branch1, branch2 (matches frontend)
-	EmployeeStatus  string     `bson:"employeeStatus"` // active, inactive, on-leave
+	JobTitle       string    `bson:"jobTitle"`
+	Department     string    `bson:"department"`          // engineering, marketing, sales, hr, finance
+	ManagerID      *UUID     `bson:"managerId,omitempty"` // Reference to another Employee
+	StartDate      time.Time `bson:"startDate"`
+	EmploymentType string    `bson:"employmentType"`     // full-time, part-time, contract, intern
+	Location       *string   `bson:"location,omitempty"` // hq, remote, branch1, branch2 (matches frontend)
+	EmployeeStatus string    `bson:"employeeStatus"`     // active, inactive, on-leave
 }
 
 // EmployeeCompensation contains compensation and benefits information
 type EmployeeCompensation struct {
-	BaseSalary     float64  `bson:"baseSalary"`
-	SalaryType     string   `bson:"salaryType"` // annual, monthly, hourly
-	Currency       string   `bson:"currency"`   // usd, eur, gbp
-	BonusEligible  bool     `bson:"bonusEligible"`
-	Benefits       []string `bson:"benefits"` // Health Insurance, Dental Insurance, etc.
+	BaseSalary    float64  `bson:"baseSalary"`
+	SalaryType    string   `bson:"salaryType"` // annual, monthly, hourly
+	Currency      string   `bson:"currency"`   // usd, eur, gbp
+	BonusEligible bool     `bson:"bonusEligible"`
+	Benefits      []string `bson:"benefits"` // Health Insurance, Dental Insurance, etc.
 }
 
 // EmployeeEmergencyContact contains emergency contact information
 type EmployeeEmergencyContact struct {
-	Name             *string `bson:"name,omitempty"`             // Contact full name
-	Relationship     *string `bson:"relationship,omitempty"`     // spouse, parent, sibling, friend, other
-	PhoneEmergency   *string `bson:"phoneEmergency,omitempty"`   // Emergency phone number
-	EmailEmergency   *string `bson:"emailEmergency,omitempty"`   // Emergency email address
+	Name           *string `bson:"name,omitempty"`           // Contact full name
+	Relationship   *string `bson:"relationship,omitempty"`   // spouse, parent, sibling, friend, other
+	PhoneEmergency *string `bson:"phoneEmergency,omitempty"` // Emergency phone number
+	EmailEmergency *string `bson:"emailEmergency,omitempty"` // Emergency email address
 }
 
 // EmployeeProfessionalInfo contains professional development information
 type EmployeeProfessionalInfo struct {
-	Skills     []string `bson:"skills"`     // Array of skills - can contain many items
-	Notes      *string  `bson:"notes,omitempty"` // Additional notes
+	Skills []string `bson:"skills"`          // Array of skills - can contain many items
+	Notes  *string  `bson:"notes,omitempty"` // Additional notes
 }
 
 // EmployeeDocuments contains document attachments for the employee
 type EmployeeDocuments struct {
-	Resume      []DocumentInfo `bson:"resume,omitempty"`      // Array of resume files
-	IDDocument  []DocumentInfo `bson:"idDocument,omitempty"`  // Array of ID documents
-	Photo       []DocumentInfo `bson:"photo,omitempty"`       // Array of photos
-	Other       []DocumentInfo `bson:"other,omitempty"`       // Other documents
+	Resume     []DocumentInfo `bson:"resume,omitempty"`     // Array of resume files
+	IDDocument []DocumentInfo `bson:"idDocument,omitempty"` // Array of ID documents
+	Photo      []DocumentInfo `bson:"photo,omitempty"`      // Array of photos
+	Other      []DocumentInfo `bson:"other,omitempty"`      // Other documents
 }
-
 
 // EmployeeStatus represents current employee status
 type EmployeeStatus struct {
-	IsActive       bool       `bson:"isActive"`
-	Status         string     `bson:"status"`         // active, inactive, on-leave, terminated
-	LastActiveAt   *time.Time `bson:"lastActiveAt,omitempty"`
-	TerminatedAt   *time.Time `bson:"terminatedAt,omitempty"`
-	TerminationReason *string `bson:"terminationReason,omitempty"`
+	IsActive          bool       `bson:"isActive"`
+	Status            string     `bson:"status"` // active, inactive, on-leave, terminated
+	LastActiveAt      *time.Time `bson:"lastActiveAt,omitempty"`
+	TerminatedAt      *time.Time `bson:"terminatedAt,omitempty"`
+	TerminationReason *string    `bson:"terminationReason,omitempty"`
 }
 
 // EmployeeMetadata contains metadata about employee record
@@ -92,50 +91,15 @@ type EmployeeMetadata struct {
 
 // EmployeeFilter represents filtering options for employee queries
 type EmployeeFilter struct {
-	Department     *string `json:"department,omitempty"`
-	EmploymentType *string `json:"employmentType,omitempty"`
-	Status         *string `json:"status,omitempty"`
-	WorkLocation   *string `json:"workLocation,omitempty"`
-	ManagerID      *string `json:"managerId,omitempty"`
-	IsActive       *bool   `json:"isActive,omitempty"`
+	Department     *string    `json:"department,omitempty"`
+	EmploymentType *string    `json:"employmentType,omitempty"`
+	Status         *string    `json:"status,omitempty"`
+	WorkLocation   *string    `json:"workLocation,omitempty"`
+	ManagerID      *string    `json:"managerId,omitempty"`
+	IsActive       *bool      `json:"isActive,omitempty"`
+	Search         *string    `json:"search,omitempty"`
 	CreatedAfter   *time.Time `json:"createdAfter,omitempty"`
 	CreatedBefore  *time.Time `json:"createdBefore,omitempty"`
-}
-
-// EmployeeCreateRequest represents request data for creating an employee
-type EmployeeCreateRequest struct {
-	PersonalInfo    EmployeePersonalInfo    `json:"personalInfo" validate:"required"`
-	EmploymentInfo  EmployeeEmploymentInfo  `json:"employmentInfo" validate:"required"`
-	Compensation    EmployeeCompensation    `json:"compensation" validate:"required"`
-	EmergencyContact EmployeeEmergencyContact `json:"emergencyContact"`
-	ProfessionalInfo EmployeeProfessionalInfo `json:"professionalInfo"`
-	Documents       EmployeeDocuments       `json:"documents"`
-}
-
-// EmployeeUpdateRequest represents request data for updating an employee
-type EmployeeUpdateRequest struct {
-	PersonalInfo    *EmployeePersonalInfo    `json:"personalInfo,omitempty"`
-	EmploymentInfo  *EmployeeEmploymentInfo  `json:"employmentInfo,omitempty"`
-	Compensation    *EmployeeCompensation    `json:"compensation,omitempty"`
-	EmergencyContact *EmployeeEmergencyContact `json:"emergencyContact,omitempty"`
-	ProfessionalInfo *EmployeeProfessionalInfo `json:"professionalInfo,omitempty"`
-	Documents       *EmployeeDocuments       `json:"documents,omitempty"`
-	Status          *EmployeeStatus          `json:"status,omitempty"`
-}
-
-// EmployeeResponse represents response data for employee API
-type EmployeeResponse struct {
-	ID              UUID                `json:"id"`
-	UserID          *UUID               `json:"userId,omitempty"`
-	EmployeeID      string              `json:"employeeId"`
-	PersonalInfo    EmployeePersonalInfo `json:"personalInfo"`
-	EmploymentInfo  EmployeeEmploymentInfo `json:"employmentInfo"`
-	Compensation    EmployeeCompensation `json:"compensation"`
-	EmergencyContact EmployeeEmergencyContact `json:"emergencyContact"`
-	ProfessionalInfo EmployeeProfessionalInfo `json:"professionalInfo"`
-	Documents       EmployeeDocuments   `json:"documents"`
-	Status          EmployeeStatus      `json:"status"`
-	Metadata        EmployeeMetadata    `json:"metadata"`
 }
 
 // Constants for employee data validation
@@ -160,9 +124,9 @@ const (
 	WorkLocationBranch2 = "branch2"
 
 	// Employee status options
-	EmployeeStatusActive   = "active"
-	EmployeeStatusInactive = "inactive"
-	EmployeeStatusOnLeave  = "on-leave"
+	EmployeeStatusActive     = "active"
+	EmployeeStatusInactive   = "inactive"
+	EmployeeStatusOnLeave    = "on-leave"
 	EmployeeStatusTerminated = "terminated"
 
 	// Gender options
@@ -172,11 +136,11 @@ const (
 	GenderPreferNotSay = "prefer-not"
 
 	// Relationship options
-	RelationshipSpouse   = "spouse"
-	RelationshipParent   = "parent"
-	RelationshipSibling  = "sibling"
-	RelationshipFriend   = "friend"
-	RelationshipOther    = "other"
+	RelationshipSpouse  = "spouse"
+	RelationshipParent  = "parent"
+	RelationshipSibling = "sibling"
+	RelationshipFriend  = "friend"
+	RelationshipOther   = "other"
 
 	// Salary type options
 	SalaryTypeAnnual  = "annual"
