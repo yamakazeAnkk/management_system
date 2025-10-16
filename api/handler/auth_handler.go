@@ -41,7 +41,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param body body interfaces.RegisterInput true "Register"
-// @Success 201 {string} string "Created"
+// @Success 200 {object} interfaces.RegisterResponse "OK"
 // @Router /auth/register [post]
 func (h *AuthHandler) Register(c *gin.Context) {
 	var in auth_types.RegisterRequest
@@ -53,7 +53,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	c.Status(http.StatusCreated)
+	c.JSON(http.StatusOK, auth_types.RegisterResponse{Message: "User registered successfully"})
 }
 
 // @Summary Refresh token
