@@ -33,8 +33,8 @@ type EmployeePersonalInfo struct {
 // EmployeeEmploymentInfo contains employment-related information
 type EmployeeEmploymentInfo struct {
 	JobTitle       string    `bson:"jobTitle"`
-	Department     string    `bson:"department"`          // engineering, marketing, sales, hr, finance
-	ManagerID      *UUID     `bson:"managerId,omitempty"` // Reference to another Employee
+	DepartmentID   *UUID     `bson:"departmentId,omitempty"` // Reference to Department
+	ManagerID      *UUID     `bson:"managerId,omitempty"`    // Reference to another Employee
 	StartDate      time.Time `bson:"startDate"`
 	EmploymentType string    `bson:"employmentType"`     // full-time, part-time, contract, intern
 	Location       *string   `bson:"location,omitempty"` // hq, remote, branch1, branch2 (matches frontend)
@@ -104,13 +104,6 @@ type EmployeeFilter struct {
 
 // Constants for employee data validation
 const (
-	// Department options
-	DepartmentEngineering = "engineering"
-	DepartmentMarketing   = "marketing"
-	DepartmentSales       = "sales"
-	DepartmentHR          = "hr"
-	DepartmentFinance     = "finance"
-
 	// Employment type options
 	EmploymentTypeFullTime = "full-time"
 	EmploymentTypePartTime = "part-time"
@@ -152,17 +145,6 @@ const (
 	CurrencyEUR = "eur"
 	CurrencyGBP = "gbp"
 )
-
-// ValidDepartments returns list of valid departments
-func ValidDepartments() []string {
-	return []string{
-		DepartmentEngineering,
-		DepartmentMarketing,
-		DepartmentSales,
-		DepartmentHR,
-		DepartmentFinance,
-	}
-}
 
 // ValidEmploymentTypes returns list of valid employment types
 func ValidEmploymentTypes() []string {

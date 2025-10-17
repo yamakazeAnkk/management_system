@@ -22,7 +22,7 @@ func (s *employeeService) CreateEmployee(ctx context.Context, req types.CreateEm
 	if req.PersonalInfo.FirstName == "" || req.PersonalInfo.LastName == "" || req.PersonalInfo.Email == "" {
 		return nil, errors.New("first name, last name, and email are required")
 	}
-	if req.EmploymentInfo.JobTitle == "" || req.EmploymentInfo.Department == "" {
+	if req.EmploymentInfo.JobTitle == "" || req.EmploymentInfo.DepartmentID == nil {
 		return nil, errors.New("job title and department are required")
 	}
 	employeeID := model.NewUUID().Hex()[:6]

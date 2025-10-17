@@ -94,7 +94,7 @@ func ConvertToEmployeeSummaryResponse(employee *model.Employee) EmployeeSummaryR
 		FullName:       employee.GetFullName(),
 		Email:          employee.PersonalInfo.Email,
 		JobTitle:       employee.EmploymentInfo.JobTitle,
-		Department:     employee.EmploymentInfo.Department,
+		Department:     employee.EmploymentInfo.DepartmentID.String(),
 		EmploymentType: employee.EmploymentInfo.EmploymentType,
 		Status:         employee.Status.Status,
 		IsActive:       employee.Status.IsActive,

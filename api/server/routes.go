@@ -40,6 +40,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	userCol := s.db.GetDatabase().Collection("users")
 	userRepo := mongodb.NewUserRepository(userCol)
+	employeeCol := s.db.GetDatabase().Collection("employees")
+	_ = employeeCol // initialized for RegisterEmployeeRoutes
 
 	// Register route groups
 	s.RegisterDebugRoutes(r)
@@ -47,6 +49,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	s.RegisterFileRoutes(r, roleRepo)
 	s.RegisterUserRoutes(r, roleRepo)
 	s.RegisterAuthRoutes(r, userRepo)
+	s.RegisterEmployeeRoutes(r)
 	s.RegisterProtectedRoutes(r)
 
 	return r
